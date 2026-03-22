@@ -101,6 +101,24 @@ export const useRegister = () => {
   });
 };
 
+// !verify email
+const verifyApi = async (payload: { email: string; otp: string }) => {
+  const { data } = await api.post("/auth/verify", payload);
+  return data;
+};
+
+// !verify email hook
+export const useVerify = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: verifyApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};
+
 //? login user
 const loginApi = async (payload: {
   user_email: string;
@@ -119,6 +137,21 @@ export const useLogin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
+  });
+};
+
+//* get me
+const getMeApi = async () => {
+  const { data } = await api.get("/auth/me");
+  return data;
+};
+
+//* GET Categories hook
+export const useGetMe = () => {
+  return useQuery({
+    queryKey: ["user"],
+    queryFn: () => getMeApi(),
+    // keepPreviousData: true,
   });
 };
 

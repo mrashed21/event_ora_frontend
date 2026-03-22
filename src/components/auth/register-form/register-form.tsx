@@ -1,18 +1,17 @@
 "use client";
-
-import { RegisterFormValues, registerSchema } from "@/schemas/register.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { useRegister } from "@/api/auth/auth.api";
 import FormInput from "@/components/custom/form-input";
 import PasswordInput from "@/components/custom/password-input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RegisterFormValues, registerSchema } from "@/schemas/register.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const RegisterForm = () => {
+  const router = useRouter();
   const { mutateAsync: userRegister, isPending } = useRegister();
 
   const form = useForm<RegisterFormValues>({
@@ -36,6 +35,7 @@ const RegisterForm = () => {
       const res = await userRegister(data);
 
       toast.success(res?.message || "Registration successful!");
+      router.push(`/auth/verify?email=${data.user_email}`);
     } catch (error: any) {
       const message = error?.response?.data?.message || "Registration failed";
 

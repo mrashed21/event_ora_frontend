@@ -1,3 +1,4 @@
+import "@/lib/axios-interceptor";
 import QueryProvider from "@/provider/provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Poppins, Roboto } from "next/font/google";
@@ -61,7 +62,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <QueryProvider>
           {children}
-          <Toaster  />
+          <Toaster />
         </QueryProvider>
       </body>
     </html>
