@@ -1,7 +1,8 @@
+import { env } from "@/utils/env";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: env.NEXT_PUBLIC_BASE_URL,
   withCredentials: true,
 });
 

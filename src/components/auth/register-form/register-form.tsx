@@ -2,15 +2,26 @@
 
 import { RegisterFormValues, registerSchema } from "@/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
+import { useRegister } from "@/api/auth/auth.api";
+import FormInput from "@/components/custom/form-input";
+import PasswordInput from "@/components/custom/password-input";
 import { toast } from "sonner";
 
 const RegisterForm = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    mutateAsync: userRegister,
+    isPending,
+    isSuccess,
+    isError,
+  } = useRegister();
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -18,6 +29,7 @@ const RegisterForm = () => {
       user_email: "",
       user_password: "",
     },
+    mode: "onChange",
   });
 
   const {
@@ -26,12 +38,25 @@ const RegisterForm = () => {
     formState: { errors, isSubmitting },
   } = form;
 
-  const onSubmit = (data: RegisterFormValues) => {
-    console.log("Form Data:", data);
+  // const onSubmit = (data: RegisterFormValues) => {
+  //   try {
+  //     userRegister(data);
+  //     isSuccess && toast.success("Registration successful!");
+  //     isError && toast.error("Registration failed. Please try again.");
+  //   } catch (error) {
+  //     console.error("Registration error:", error);
+  //   }
+  // };
 
-    toast.success("Register Successful ✅", {
-      description: "Data logged in console",
-    });
+  const onSubmit = async (data: RegisterFormValues) => {
+    try {
+      await userRegister(data);
+
+      toast.success("Registration successful!");
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+      console.error("Registration error:", error);
+    }
   };
 
   return (
@@ -43,54 +68,67 @@ const RegisterForm = () => {
           </CardTitle>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-5">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Name */}
-            <div className="space-y-1">
-              <Input placeholder="Enter your name" {...register("user_name")} />
-              {errors.user_name && (
-                <p className="text-sm text-red-500">
-                  {errors.user_name.message}
-                </p>
-              )}
-            </div>
+            <FormInput
+              label="Name"
+              name="user_name"
+              placeholder="Enter your name"
+              register={register}
+              error={errors.user_name}
+            />
 
-            {/* Email */}
-            <div className="space-y-1">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                {...register("user_email")}
-              />
-              {errors.user_email && (
-                <p className="text-sm text-red-500">
-                  {errors.user_email.message}
-                </p>
-              )}
-            </div>
+            <FormInput
+              label="Email"
+              name="user_email"
+              placeholder="Enter your email"
+              type="email"
+              register={register}
+              error={errors.user_email}
+            />
 
-            {/* Password */}
-            <div className="space-y-1">
-              <Input
-                type="password"
-                placeholder="Enter your password"
-                {...register("user_password")}
-              />
-              {errors.user_password && (
-                <p className="text-sm text-red-500">
-                  {errors.user_password.message}
-                </p>
-              )}
-            </div>
+            <PasswordInput
+              label="Password"
+              name="user_password"
+              placeholder="Enter your password"
+              register={register}
+              error={errors.user_password}
+            />
 
             {/* Submit */}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Register"}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isPending || isSubmitting}
+            >
+              {isPending || isSubmitting ? "Submitting..." : "Register"}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2">
+            <div className="h-px bg-border flex-1" />
+            <span className="text-xs text-muted-foreground">OR</span>
+            <div className="h-px bg-border flex-1" />
+          </div>
+
+          {/* Google Button */}
+          <Button
+            variant="outline"
+            className="w-full flex items-center gap-2"
+            onClick={() => toast.info("Google login clicked")}
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </Button>
         </CardContent>
       </Card>
     </div>
   );
 };
+
 export default RegisterForm;
