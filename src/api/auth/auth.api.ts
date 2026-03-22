@@ -101,6 +101,27 @@ export const useRegister = () => {
   });
 };
 
+//? login user
+const loginApi = async (payload: {
+  user_email: string;
+  user_password: string;
+}) => {
+  const { data } = await api.post("/auth/login", payload);
+  return data;
+};
+
+//? login user hook
+export const useLogin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: loginApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};
+
 // todo UPDATE Category
 const updateCategoryApi = async ({
   payload,

@@ -1,24 +1,23 @@
 "use client";
 
-import { RegisterFormValues, registerSchema } from "@/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useRegister } from "@/api/auth/auth.api";
+import { useLogin } from "@/api/auth/auth.api";
 import FormInput from "@/components/custom/form-input";
 import PasswordInput from "@/components/custom/password-input";
+import { LoginFormValues, loginSchema } from "@/schemas/login.schema";
 import { toast } from "sonner";
 
-const RegisterForm = () => {
-  const { mutateAsync: userRegister, isPending } = useRegister();
+const LoginForm = () => {
+  const { mutateAsync: userlogin, isPending } = useLogin();
 
-  const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      user_name: "",
       user_email: "",
       user_password: "",
     },
@@ -31,17 +30,17 @@ const RegisterForm = () => {
     formState: { errors, isSubmitting },
   } = form;
 
-  const onSubmit = async (data: RegisterFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await userRegister(data);
+      const res = await userlogin(data);
 
-      toast.success(res?.message || "Registration successful!");
+      toast.success(res?.message || "Login successful!");
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Registration failed";
+      const message = error?.response?.data?.message || "Login failed";
 
       toast.error(message);
 
-      console.error("Registration error:", error);
+      console.error("Login error:", error);
     }
   };
 
@@ -50,20 +49,12 @@ const RegisterForm = () => {
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">
-            Register
+            Login
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-5">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <FormInput
-              label="Name"
-              name="user_name"
-              placeholder="Enter your name"
-              register={register}
-              error={errors.user_name}
-            />
-
             <FormInput
               label="Email"
               name="user_email"
@@ -87,7 +78,7 @@ const RegisterForm = () => {
               className="w-full"
               disabled={isPending || isSubmitting}
             >
-              {isPending || isSubmitting ? "Loading..." : "Register"}
+              {isPending || isSubmitting ? "Loading..." : "Login"}
             </Button>
           </form>
 
@@ -102,7 +93,7 @@ const RegisterForm = () => {
           <Button
             variant="outline"
             className="w-full flex items-center gap-2"
-            onClick={() => toast.info("Google register clicked")}
+            onClick={() => toast.info("Google login clicked")}
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -117,4 +108,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
