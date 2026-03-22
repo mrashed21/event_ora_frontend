@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetMe } from "@/api/auth/auth.api";
 import Container from "@/components/custom/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +13,21 @@ import {
 } from "@/components/ui/sheet";
 import { Menu, Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
+  const { data, isLoading } = useGetMe();
+  const user = data?.data;
+  console.log(user);
+
+  const handleRidirect = () => {
+    if (user?.user_role === "admin" || user?.user_role === "super_admin") {
+      router.push("/admin/dashboard");
+    } else {
+      router.push("/user/dashboard");
+    }
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <Container>
@@ -58,12 +72,29 @@ const Navbar = () => {
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center gap-2">
-              <Link href="/auth/login" className="text-sm font-medium">
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link href="/auth/register" className="text-sm font-medium">
-                <Button>Register</Button>
-              </Link>
+              {user ? (
+                <div className="flex items-center gap-2">
+                  {/* {user?.} */}
+
+                  <span
+                    onClick={() => {
+                      handleRidirect();
+                    }}
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    {user.name}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="text-sm font-medium">
+                    <Button variant="ghost">Login</Button>
+                  </Link>
+                  <Link href="/auth/register" className="text-sm font-medium">
+                    <Button>Register</Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}

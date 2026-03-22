@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "@/lib/axios-interceptor";
 import QueryProvider from "@/provider/provider";
 import type { Metadata } from "next";
@@ -61,8 +62,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          {children}
-          <Toaster />
+          <TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </QueryProvider>
       </body>
     </html>
