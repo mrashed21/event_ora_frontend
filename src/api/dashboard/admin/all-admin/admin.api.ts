@@ -51,14 +51,14 @@ export const useAdmins = ({
 };
 
 //? create admin
-const createAdminApi = async (payload: {
-  admin_name: string;
-  admin_email: string;
-  profile_photo: string | null;
-  contact_number: string | null;
-  admin_role: string;
-}) => {
-  const { data } = await api.post("/admin", payload);
+const createAdminApi = async (formData: FormData) => {
+  const { data } = await api.post("/admin", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true, 
+  });
+
   return data;
 };
 

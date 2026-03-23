@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginFormValues, loginSchema } from "@/schemas/login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const LoginForm = () => {
+  const router = useRouter();
   const { mutateAsync: userlogin, isPending } = useLogin();
 
   const form = useForm<LoginFormValues>({
@@ -31,8 +33,14 @@ const LoginForm = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const res = await userlogin(data);
-
       toast.success(res?.message || "Login successful!");
+      if (
+        (res?.data?.user_role === "admin" ||
+          res?.data?.user_role === "super_admin") &&
+        res?.data?.need_password_change
+      ) {
+        router.push("/auth/change-password");
+      }
     } catch (error: any) {
       const message = error?.response?.data?.message || "Login failed";
 

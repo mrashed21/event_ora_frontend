@@ -20,7 +20,7 @@ const Navbar = () => {
   const { data, isLoading } = useGetMe();
   const user = data?.data;
 
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Loading...</p>
@@ -35,6 +35,7 @@ const Navbar = () => {
       router.push("/user/dashboard");
     }
   };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <Container>
