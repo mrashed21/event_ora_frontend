@@ -19,7 +19,14 @@ const Navbar = () => {
   const router = useRouter();
   const { data, isLoading } = useGetMe();
   const user = data?.data;
-  console.log(user);
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   const handleRidirect = () => {
     if (user?.user_role === "admin" || user?.user_role === "super_admin") {
@@ -65,7 +72,7 @@ const Navbar = () => {
           {/* RIGHT */}
           <div className="flex items-center gap-2 flex-1 justify-end">
             {/*  Search  */}
-            <div className="relative w-full max-w-[180px] sm:max-w-[220px] md:max-w-[250px]">
+            <div className="relative w-full max-w-45 sm:max-w-55 md:max-w-62.5">
               <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
               <Input placeholder="Search..." className="pl-8 h-9" />
             </div>
@@ -111,7 +118,7 @@ const Navbar = () => {
 
               <SheetContent
                 side="right"
-                className="w-[280px] sm:w-[320px] px-5 py-4"
+                className="w-70 sm:w-[320px] px-5 py-4"
               >
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>

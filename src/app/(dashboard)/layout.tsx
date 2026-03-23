@@ -2,26 +2,39 @@
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
+import { useGetMe } from "@/api/auth/auth.api";
 import AppBreadcrumb from "@/components/dasboard/app-breadcrumb";
 import AppSidebar from "@/components/dasboard/app-sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const role = "super_admin";
+  const { data, isLoading } = useGetMe();
+
+  const role = data?.data?.user_role;
+
+  if (isLoading || !role) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <SidebarProvider>
-      <AppSidebar role={role} />
+    <main>
+      <SidebarProvider>
+        <AppSidebar role={role} />
 
-      <SidebarInset>
-        {/* Top Bar */}
-        <header className="flex h-14 items-center border-b px-4">
-          <AppBreadcrumb />
-        </header>
+        <SidebarInset>
+          {/* Top Bar */}
+          <header className="flex h-14 items-center border-b px-4">
+            <AppBreadcrumb />
+          </header>
 
-        {/* Page Content */}
-        <main className="p-6">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+          {/* Page Content */}
+          <main className="p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </main>
   );
 };
 

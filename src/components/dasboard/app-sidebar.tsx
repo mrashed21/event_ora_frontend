@@ -21,13 +21,15 @@ import { ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { sidebarItems, UserRole } from "./data";
 
-const AppSidebar = ({ role }: { role: UserRole }) => {
+const AppSidebar = ({ role }: { role: string }) => {
   const pathname = usePathname();
   const router = useRouter();
 
   const { state, setOpen } = useSidebar();
 
-  const filtered = sidebarItems.filter((item) => item.roles.includes(role));
+  const filtered = sidebarItems.filter((item) =>
+    item.roles.includes(role as UserRole),
+  );
 
   return (
     <Sidebar collapsible="icon">

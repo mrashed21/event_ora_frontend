@@ -1,19 +1,17 @@
-import { GetPaginationParams } from "@/interface/meta-interface";
+import { ApiResponse, GetPaginationParams } from "@/interface/meta-interface";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api";
 
 //! TYPES
+export type CategoryResponse = ApiResponse<CategoryInterface>;
 
 export interface CategoryInterface {
   id: string;
-  name: string;
-  slug: string;
-  isActive: boolean;
-  createdAt: string;
-  user: {
-    id: string;
-    name: string;
-  };
+  category_name: string;
+  category_description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 //* GET Category (pagination + search_term)
@@ -74,79 +72,24 @@ export const useCategoriesAdmin = ({
   });
 };
 
-//? register user
-const registerApi = async (payload: {
-  user_name: string;
-  user_email: string;
-  user_password: string;
+//? create Category
+const createCategoryApi = async (payload: {
+  category_name: string;
+  category_description: string | null;
 }) => {
-  const { data } = await api.post("/auth/register", payload);
+  const { data } = await api.post("/category", payload);
   return data;
 };
 
-//? register user hook
-export const useRegister = () => {
+//? create Category hook
+export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: registerApi,
+    mutationFn: createCategoryApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
-  });
-};
-
-// !verify email
-const verifyApi = async (payload: { email: string; otp: string }) => {
-  const { data } = await api.post("/auth/verify", payload);
-  return data;
-};
-
-// !verify email hook
-export const useVerify = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: verifyApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-  });
-};
-
-//? login user
-const loginApi = async (payload: {
-  user_email: string;
-  user_password: string;
-}) => {
-  const { data } = await api.post("/auth/login", payload);
-  return data;
-};
-
-//? login user hook
-export const useLogin = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: loginApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-  });
-};
-
-//* get me
-const getMeApi = async () => {
-  const { data } = await api.get("/auth/me");
-  return data;
-};
-
-//* GET Categories hook
-export const useGetMe = () => {
-  return useQuery({
-    queryKey: ["user"],
-    queryFn: () => getMeApi(),
-    // keepPreviousData: true,
   });
 };
 
@@ -156,12 +99,12 @@ const updateCategoryApi = async ({
 }: {
   payload: {
     id: string;
-    name: string;
-    slug: string;
-    isActive: boolean;
+    category_name: string;
+    category_description: string | null;
+    is_active: boolean;
   };
 }) => {
-  const { data } = await api.patch("/category", payload);
+  const { data } = await api.patch(`/category/${payload.id}`, payload);
   return data;
 };
 
@@ -179,7 +122,7 @@ export const useUpdateCategory = () => {
 
 //! DELETE Category
 const deleteCategoryApi = async (id: string) => {
-  const { data } = await api.delete(`/category`, { data: { id } });
+  const { data } = await api.delete(`/category/${id}`);
   return data;
 };
 

@@ -53,7 +53,7 @@ export const sidebarItems: SidebarItem[] = [
     children: [
       {
         title: "Manage Admin",
-        path: "/dashboard/admins",
+        path: "/admin/all-admin",
         roles: ["super_admin"],
       },
     ],

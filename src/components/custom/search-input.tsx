@@ -1,0 +1,44 @@
+"use client";
+
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { useDebounce } from "./use-debounce";
+
+interface SearchInputProps {
+  value?: string;
+  defaultValue?: string;
+  delay?: number;
+  placeholder?: string;
+  className?: string;
+  onSearch: (value: string) => void;
+}
+
+const SearchInput = ({
+  value: controlledValue,
+  defaultValue = "",
+  delay = 300,
+  placeholder = "Search...",
+  className = "",
+  onSearch,
+}: SearchInputProps) => {
+  const [value, setValue] = useState(defaultValue);
+
+  const inputValue = controlledValue ?? value;
+
+  const debouncedValue = useDebounce(inputValue, delay);
+
+  useEffect(() => {
+    onSearch(debouncedValue.trim());
+  }, [debouncedValue, onSearch]);
+
+  return (
+    <Input
+      value={inputValue}
+      onChange={(e) => setValue(e.target.value)}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
+};
+
+export default SearchInput;
