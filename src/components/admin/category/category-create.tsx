@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 import { useCreateCategory } from "@/api/category/category.api";
@@ -17,8 +17,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 import {
-    create_category_schema,
-    CreateCategoryInput,
+  create_category_schema,
+  CreateCategoryInput,
 } from "@/schemas/category.schema";
 
 import { toast } from "sonner";
@@ -41,18 +41,20 @@ const CategoryCreate = ({ open, onOpenChange }: Props) => {
   } = useForm<CreateCategoryInput>({
     resolver: zodResolver(create_category_schema),
     defaultValues: {
-      category_name: "",
+      category_type: "",
       category_description: "",
-      is_active: true,
+      category_status: "active",
+      is_paid: true,
     },
   });
 
   const onSubmit = async (data: CreateCategoryInput) => {
     try {
       const payload = {
-        category_name: data.category_name,
+        category_type: data.category_type,
         category_description: data.category_description || "",
-        is_active: data.is_active ?? true,
+        category_status: data.category_status,
+        is_paid: data.is_paid,
       };
 
       const res = await createCategory(payload);
@@ -76,13 +78,13 @@ const CategoryCreate = ({ open, onOpenChange }: Props) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Category Name */}
+          {/* Category Type */}
           <FormInput
-            label="Category Name"
-            name="category_name"
-            placeholder="Enter category name"
+            label="Category Type"
+            name="category_type"
+            placeholder="Enter category type"
             register={register}
-            error={errors.category_name}
+            error={errors.category_type}
           />
 
           {/* Description */}
@@ -92,20 +94,27 @@ const CategoryCreate = ({ open, onOpenChange }: Props) => {
               placeholder="Optional description"
               {...register("category_description")}
             />
-            {errors.category_description && (
-              <p className="text-sm text-red-500">
-                {errors.category_description.message}
-              </p>
-            )}
           </div>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Active */}
+            <div className="flex items-center justify-start gap-3">
+              <label className="text-sm font-medium">Active</label>
+              <Switch
+                checked={watch("category_status") === "active"}
+                onCheckedChange={(val) =>
+                  setValue("category_status", val ? "active" : "in_active")
+                }
+              />
+            </div>
 
-          {/* Active Switch */}
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Active</label>
-            <Switch
-              checked={watch("is_active")}
-              onCheckedChange={(val) => setValue("is_active", val)}
-            />
+            {/* Paid */}
+            <div className="flex items-center justify-start gap-3">
+              <label className="text-sm font-medium">Paid</label>
+              <Switch
+                // checked={watch("is_paid")}
+                onCheckedChange={(val) => setValue("is_paid", val)}
+              />
+            </div>
           </div>
 
           {/* Actions */}

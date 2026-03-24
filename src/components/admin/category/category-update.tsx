@@ -26,9 +26,10 @@ import { toast } from "sonner";
 
 type Category = {
   id: string;
-  category_name: string;
+  category_type: string;
   category_description?: string;
-  is_active: boolean;
+  category_status: "active" | "in_active";
+  is_paid: boolean;
 };
 
 type Props = {
@@ -50,18 +51,20 @@ const CategoryUpdate = ({ open, onOpenChange, category }: Props) => {
   } = useForm<CreateCategoryInput>({
     resolver: zodResolver(create_category_schema),
     defaultValues: {
-      category_name: "",
+      category_type: "",
       category_description: "",
-      is_active: true,
+      category_status: "active",
+      is_paid: true,
     },
   });
 
   useEffect(() => {
     if (category && open) {
       reset({
-        category_name: category.category_name,
+        category_type: category.category_type || "",
         category_description: category.category_description || "",
-        is_active: category.is_active,
+        category_status: category.category_status || "active",
+        is_paid: category.is_paid || false,
       });
     }
   }, [category, open, reset]);
@@ -72,9 +75,10 @@ const CategoryUpdate = ({ open, onOpenChange, category }: Props) => {
     try {
       const payload = {
         id: category.id,
-        category_name: data.category_name,
+        category_type: data.category_type || "",
         category_description: data.category_description || "",
-        is_active: data.is_active ?? true,
+        category_status: data.category_status || "active",
+        is_paid: data.is_paid || false,
       };
 
       const res = await updateCategory(payload);
@@ -98,13 +102,13 @@ const CategoryUpdate = ({ open, onOpenChange, category }: Props) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Category Name */}
+          {/* Category Type */}
           <FormInput
-            label="Category Name"
-            name="category_name"
-            placeholder="Enter category name"
+            label="Category Type"
+            name="category_type"
+            placeholder="Enter category type"
             register={register}
-            error={errors.category_name}
+            error={errors.category_type}
           />
 
           {/* Description */}
@@ -114,21 +118,31 @@ const CategoryUpdate = ({ open, onOpenChange, category }: Props) => {
               placeholder="Optional description"
               {...register("category_description")}
             />
-            {errors.category_description && (
-              <p className="text-sm text-red-500">
-                {errors.category_description.message}
-              </p>
-            )}
           </div>
 
-          {/* Active Switch */}
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Active</label>
-            <Switch
-              checked={watch("is_active")}
-              onCheckedChange={(val) => setValue("is_active", val)}
-              disabled={isPending}
-            />
+          {/* Active + Paid (Same Row) */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Active */}
+            <div className="flex items-center justify-start gap-3">
+              <label className="text-sm font-medium">Active</label>
+              <Switch
+                checked={watch("category_status") === "active"}
+                onCheckedChange={(val) =>
+                  setValue("category_status", val ? "active" : "in_active")
+                }
+                disabled={isPending}
+              />
+            </div>
+
+            {/* Paid */}
+            <div className="flex items-center justify-start gap-3">
+              <label className="text-sm font-medium">Paid</label>
+              <Switch
+                checked={watch("is_paid")}
+                onCheckedChange={(val) => setValue("is_paid", val)}
+                disabled={isPending}
+              />
+            </div>
           </div>
 
           {/* Actions */}

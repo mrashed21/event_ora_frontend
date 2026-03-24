@@ -4,14 +4,18 @@ import {
   CategoryInterface,
   useDeleteCategory,
 } from "@/api/category/category.api";
+import TableSkeleton from "@/components/skeleton/table-skeleton";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import {
   Table,
   TableBody,
@@ -20,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { PanelTopDashed, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,20 +39,16 @@ interface Props {
 const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   const { mutateAsync: deleteCategory } = useDeleteCategory();
 
-  const [description_modal_open, set_description_modal_open] = useState(false);
-  const [selected_description, set_selected_description] = useState("");
+  const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  const [selectedDescription, setSelectedDescription] = useState("");
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-10">
-        <p>Loading...</p>
-      </div>
-    );
+    return <TableSkeleton />;
   }
 
   const handleDescriptionClick = (description: string) => {
-    set_selected_description(description);
-    set_description_modal_open(true);
+    setSelectedDescription(description);
+    setDescriptionModalOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -68,9 +69,10 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
         <TableHeader>
           <TableRow>
             <TableHead>#</TableHead>
-            <TableHead>Name</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Active </TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -81,54 +83,75 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
           {data.length > 0 ? (
             data.map((category, index) => (
               <TableRow key={category.id}>
+                {/* Serial */}
                 <TableCell className="font-medium">{serial(index)}</TableCell>
 
-                <TableCell className="font-medium">
-                  {category.category_name}
+                {/* Category Type */}
+                <TableCell className="font-medium capitalize">
+                  {category.category_type}
                 </TableCell>
 
+                {/* Description */}
                 <TableCell>
                   <Button
                     variant="outline"
+                    size="icon"
                     onClick={() =>
                       handleDescriptionClick(
                         category.category_description || "",
                       )
                     }
                   >
-                    <PanelTopDashed />
+                    <PanelTopDashed className="w-4 h-4" />
                   </Button>
                 </TableCell>
 
                 <TableCell>
                   <Badge
-                    variant={category.is_active ? "default" : "secondary"}
+                    variant={category.is_paid ? "default" : "outline"}
                     className="capitalize"
                   >
-                    {category.is_active ? "Active" : "In Active"}
+                    {category.is_paid ? "Paid" : "Free"}
                   </Badge>
                 </TableCell>
 
+                {/* Status  */}
+                <TableCell>
+                  <Badge
+                    variant={
+                      category.category_status === "active"
+                        ? "default"
+                        : "secondary"
+                    }
+                    className="capitalize"
+                  >
+                    {category.category_status === "active"
+                      ? "Active"
+                      : "Inactive"}
+                  </Badge>
+                </TableCell>
+
+                {/* Created */}
                 <TableCell>
                   {new Date(category.created_at).toLocaleDateString()}
                 </TableCell>
 
+                {/* Actions */}
                 <TableCell className="text-right flex items-center justify-end gap-2">
                   <Button
                     variant="outline"
-                    className="text-sm hover:underline"
+                    size="icon"
                     onClick={() => handleUpdate(category)}
                   >
-                    <Pencil />
+                    <Pencil className="w-4 h-4" />
                   </Button>
+
                   <Button
-                    onClick={() => {
-                      handleDelete(category.id);
-                    }}
                     variant="destructive"
-                    className="text-sm hover:underline"
+                    size="icon"
+                    onClick={() => handleDelete(category.id)}
                   >
-                    <Trash2 />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -148,9 +171,9 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
 
       {/* Description Modal */}
       <DescriptionModal
-        open={description_modal_open}
-        onOpenChange={set_description_modal_open}
-        description={selected_description}
+        open={descriptionModalOpen}
+        onOpenChange={setDescriptionModalOpen}
+        description={selectedDescription}
       />
     </div>
   );
@@ -169,14 +192,16 @@ const DescriptionModal = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Category Description</DialogTitle>
         </DialogHeader>
-        <div className="p-4">
-          <p>{description || "No description provided."}</p>
+
+        <div className="p-4 text-sm text-muted-foreground capitalize">
+          {description || "No description provided."}
         </div>
-        <div className="flex justify-end p-4">
+
+        <div className="flex justify-end">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>

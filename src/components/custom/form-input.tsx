@@ -21,7 +21,7 @@ const FormInput = ({
   error,
 }: FormInputProps) => {
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <label className="text-sm font-medium">{label}</label>
 
       <Input type={type} placeholder={placeholder} {...register(name)} />

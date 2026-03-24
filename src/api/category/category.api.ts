@@ -7,9 +7,10 @@ export type CategoryResponse = ApiResponse<CategoryInterface>;
 
 export interface CategoryInterface {
   id: string;
-  category_name: string;
+  category_type: string;
   category_description: string | null;
-  is_active: boolean;
+  is_paid: boolean;
+  category_status: "active" | "in_active";
   created_at: string;
   updated_at: string;
 }
@@ -74,8 +75,10 @@ export const useCategoriesAdmin = ({
 
 //? create Category
 const createCategoryApi = async (payload: {
-  category_name: string;
+  category_type: string;
   category_description: string | null;
+  category_status: "active" | "in_active";
+  is_paid: boolean;
 }) => {
   const { data } = await api.post("/category", payload);
   return data;
@@ -96,9 +99,10 @@ export const useCreateCategory = () => {
 // todo UPDATE Category
 const updateCategoryApi = async (payload: {
   id: string;
-  category_name: string;
+  category_type: string;
   category_description: string | null;
-  is_active: boolean;
+  category_status: "active" | "in_active";
+  is_paid: boolean;
 }) => {
   const { data } = await api.patch(`/category/${payload.id}`, payload);
   return data;

@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminInterface } from "@/api/dashboard/admin/all-admin/admin.api";
+import TableSkeleton from "@/components/skeleton/table-skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -19,11 +20,7 @@ interface Props {
 
 const AdminTable = ({ data, isLoading, serial }: Props) => {
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-10">
-        <p>Loading...</p>
-      </div>
-    );
+    return <TableSkeleton />;
   }
 
   return (
