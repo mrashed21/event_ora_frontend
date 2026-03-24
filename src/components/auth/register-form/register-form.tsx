@@ -1,11 +1,13 @@
 "use client";
 import { useRegister } from "@/api/auth/auth.api";
 import FormInput from "@/components/custom/form-input";
+import GoogleLogin from "@/components/custom/google-login";
 import PasswordInput from "@/components/custom/password-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegisterFormValues, registerSchema } from "@/schemas/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -35,7 +37,7 @@ const RegisterForm = () => {
       const res = await userRegister(data);
 
       toast.success(res?.message || "Registration successful!");
-      router.push(`/auth/verify?email=${data.user_email}`);
+      router.push(`/auth/verify?email=${encodeURIComponent(data.user_email)}`);
     } catch (error: any) {
       const message = error?.response?.data?.message || "Registration failed";
 
@@ -99,18 +101,16 @@ const RegisterForm = () => {
           </div>
 
           {/* Google Button */}
-          <Button
-            variant="outline"
-            className="w-full flex items-center gap-2"
-            onClick={() => toast.info("Google register clicked")}
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="google"
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </Button>
+          <GoogleLogin />
+          {/* Register */}
+          <div className="text-center text-muted-foreground -mt-3">
+            Already have an account?{" "}
+            <Link href="/auth/login">
+              <Button variant={"link"} size={"sm"} type="button">
+                Login
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

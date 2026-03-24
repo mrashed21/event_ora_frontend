@@ -2,11 +2,13 @@
 
 import { useLogin } from "@/api/auth/auth.api";
 import FormInput from "@/components/custom/form-input";
+import GoogleLogin from "@/components/custom/google-login";
 import PasswordInput from "@/components/custom/password-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginFormValues, loginSchema } from "@/schemas/login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,11 +42,25 @@ const LoginForm = () => {
         res?.data?.need_password_change
       ) {
         router.push("/auth/change-password");
+      } else {
+        router.push("/");
       }
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Login failed";
+      const errorCode = error?.response?.data?.error?.body?.code;
+
+      const message =
+        errorCode === "EMAIL_NOT_VERIFIED"
+          ? "Email not verified. Please verify your email before logging in."
+          : error?.response?.data?.message || "Login failed";
 
       toast.error(message);
+
+      if (errorCode === "EMAIL_NOT_VERIFIED") {
+        const email = form.getValues("user_email");
+
+        router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
+        return;
+      }
 
       console.error("Login error:", error);
     }
@@ -86,6 +102,13 @@ const LoginForm = () => {
             >
               {isPending || isSubmitting ? "Loading..." : "Login"}
             </Button>
+            <div className="text-right -my-5">
+              <Link href="/auth/forgot-password">
+                <Button type="button" variant={"link"} size={"sm"}>
+                  Forgot Password?
+                </Button>
+              </Link>
+            </div>
           </form>
 
           {/* Divider */}
@@ -96,18 +119,17 @@ const LoginForm = () => {
           </div>
 
           {/* Google Button */}
-          <Button
-            variant="outline"
-            className="w-full flex items-center gap-2"
-            onClick={() => toast.info("Google login clicked")}
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="google"
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </Button>
+          <GoogleLogin />
+
+          {/* Register */}
+          <div className="text-center text-muted-foreground -mt-3">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/register">
+              <Button variant={"link"} size={"sm"} type="button">
+                Register
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -15,7 +15,8 @@ const VerifyForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const email = searchParams.get("email");
+  const rawEmail = searchParams.get("email");
+  const email = rawEmail ? decodeURIComponent(rawEmail) : null;
 
   const [otp, setOtp] = useState("");
 
@@ -33,10 +34,12 @@ const VerifyForm = () => {
       };
       const res = await verifyUser(payload);
 
-      toast.success(res?.message || "Verified successfully!");
+      console.log("res: ", res);
+      toast.success(
+        res?.message || "Verified successfully! You can now log in.",
+      );
 
-      // ✅ redirect to home
-      router.push("/");
+      router.push("/auth/login");
     } catch (error: any) {
       const message = error?.response?.data?.message || "Verification failed";
       toast.error(message);
