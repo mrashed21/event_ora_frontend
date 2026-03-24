@@ -66,7 +66,7 @@ export const useCategoriesAdmin = ({
   search_term,
 }: GetPaginationParams) => {
   return useQuery({
-    queryKey: ["categories/admin", page, limit, search_term],
+    queryKey: ["categories", page, limit, search_term],
     queryFn: () => getCategoriesAdminApi({ page, limit, search_term }),
     // keepPreviousData: true,
   });
@@ -94,15 +94,11 @@ export const useCreateCategory = () => {
 };
 
 // todo UPDATE Category
-const updateCategoryApi = async ({
-  payload,
-}: {
-  payload: {
-    id: string;
-    category_name: string;
-    category_description: string | null;
-    is_active: boolean;
-  };
+const updateCategoryApi = async (payload: {
+  id: string;
+  category_name: string;
+  category_description: string | null;
+  is_active: boolean;
 }) => {
   const { data } = await api.patch(`/category/${payload.id}`, payload);
   return data;

@@ -1,4 +1,11 @@
-import { LayoutDashboard, Settings, Shield, User, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Settings,
+  Shield,
+  User,
+  Users,
+} from "lucide-react";
 
 export type UserRole = "user" | "admin" | "super_admin";
 
@@ -43,8 +50,14 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Settings",
     icon: Settings,
-    path: "/dashboard/settings",
+    path: "/admin/category",
     roles: ["user", "admin", "super_admin"],
+  },
+  {
+    title: "Category",
+    icon: Package,
+    path: "/admin/category",
+    roles: ["admin", "super_admin"],
   },
   {
     title: "Admin",
