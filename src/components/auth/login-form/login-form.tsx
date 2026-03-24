@@ -29,8 +29,11 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = form;
+
+  const email = watch("user_email");
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -56,8 +59,6 @@ const LoginForm = () => {
       toast.error(message);
 
       if (errorCode === "EMAIL_NOT_VERIFIED") {
-        const email = form.getValues("user_email");
-
         router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
         return;
       }
@@ -103,7 +104,13 @@ const LoginForm = () => {
               {isPending || isSubmitting ? "Loading..." : "Login"}
             </Button>
             <div className="text-right -my-5">
-              <Link href="/auth/forgot-password">
+              <Link
+                href={
+                  email
+                    ? `/auth/forgot-password?email=${encodeURIComponent(email)}`
+                    : "/auth/forgot-password"
+                }
+              >
                 <Button type="button" variant={"link"} size={"sm"}>
                   Forgot Password?
                 </Button>

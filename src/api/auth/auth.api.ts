@@ -1,78 +1,5 @@
-import { GetPaginationParams } from "@/interface/meta-interface";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api";
-
-//! TYPES
-
-export interface CategoryInterface {
-  id: string;
-  name: string;
-  slug: string;
-  isActive: boolean;
-  createdAt: string;
-  user: {
-    id: string;
-    name: string;
-  };
-}
-
-//* GET Category (pagination + search_term)
-const getCategoriesApi = async ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
-  const params: any = { page, limit };
-
-  if (search_term?.trim()) {
-    params.search_term = search_term;
-  }
-
-  const { data } = await api.get("/category", { params });
-  return data;
-};
-
-//* GET Categories hook
-export const useCategories = ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
-  return useQuery({
-    queryKey: ["categories", page, limit, search_term],
-    queryFn: () => getCategoriesApi({ page, limit, search_term }),
-    // keepPreviousData: true,
-  });
-};
-
-//* GET Category (pagination + search_term) admin
-const getCategoriesAdminApi = async ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
-  const params: any = { page, limit };
-
-  if (search_term?.trim()) {
-    params.search_term = search_term;
-  }
-
-  const { data } = await api.get("/category/admin", { params });
-  return data;
-};
-
-//* GET Categories hook
-export const useCategoriesAdmin = ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
-  return useQuery({
-    queryKey: ["categories/admin", page, limit, search_term],
-    queryFn: () => getCategoriesAdminApi({ page, limit, search_term }),
-    // keepPreviousData: true,
-  });
-};
 
 //? register user
 const registerApi = async (payload: {
@@ -150,47 +77,42 @@ export const useGetMe = () => {
   });
 };
 
-// todo UPDATE Category
-const updateCategoryApi = async ({
-  payload,
-}: {
-  payload: {
-    id: string;
-    name: string;
-    slug: string;
-    isActive: boolean;
-  };
-}) => {
-  const { data } = await api.patch("/category", payload);
+// ! forgot password
+const forgotPasswordApi = async (payload: { email: string }) => {
+  const { data } = await api.post("/auth/forget_password", payload);
   return data;
 };
 
-//todo UPDATE Category hook
-export const useUpdateCategory = () => {
+// ! forgot password hook
+export const useForgotPassword = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateCategoryApi,
+    mutationFn: forgotPasswordApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };
 
-//! DELETE Category
-const deleteCategoryApi = async (id: string) => {
-  const { data } = await api.delete(`/category`, { data: { id } });
+// ! reset password
+const resetPasswordApi = async (payload: {
+  email: string;
+  otp: string;
+  new_password: string;
+}) => {
+  const { data } = await api.post("/auth/reset_password", payload);
   return data;
 };
 
-//! DELETE Category hook
-export const useDeleteCategory = () => {
+// ! reset password hook
+export const useResetPassword = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteCategoryApi,
+    mutationFn: resetPasswordApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };
