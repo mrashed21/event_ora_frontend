@@ -1,4 +1,5 @@
 import ForgotPassword from "@/components/auth/forgot-password/forgot-password";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Forgot Password",
@@ -7,7 +8,9 @@ export const metadata = {
 const ForgotPasswordPage = () => {
   return (
     <section>
-      <ForgotPassword />
+      <Suspense fallback={<p>Loading...</p>}>
+        <ForgotPassword />
+      </Suspense>
     </section>
   );
 };

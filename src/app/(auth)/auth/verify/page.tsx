@@ -1,4 +1,5 @@
 import VerifyForm from "@/components/auth/verify-form/verify-form";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Verify Account",
@@ -7,7 +8,9 @@ export const metadata = {
 const VerifyPage = () => {
   return (
     <section>
-      <VerifyForm />
+      <Suspense fallback={<p>Loading...</p>}>
+        <VerifyForm />
+      </Suspense>
     </section>
   );
 };
