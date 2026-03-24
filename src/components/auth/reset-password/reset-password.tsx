@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 
-import { useResetPassword } from "@/api/auth/auth.api";
+import { useForgotPassword, useResetPassword } from "@/api/auth/auth.api";
 import PasswordInput from "@/components/custom/password-input";
 import { toast } from "sonner";
 
@@ -29,7 +29,10 @@ const resetSchema = z.object({
 type ResetFormValues = z.infer<typeof resetSchema>;
 
 const ResetPassword = () => {
+  const [timer, setTimer] = useState(0);
   const { mutateAsync: resetPassword } = useResetPassword();
+
+  const { mutateAsync: resendOtp } = useForgotPassword();
   const searchParams = useSearchParams();
 
   const rawEmail = searchParams.get("email");
@@ -53,7 +56,18 @@ const ResetPassword = () => {
     formState: { errors, isSubmitting },
   } = form;
 
-  // 🔁 OTP sync with RHF
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
   const handleOtpChange = (value: string) => {
     setOtp(value);
     setValue("otp", value, { shouldValidate: true });
@@ -61,8 +75,6 @@ const ResetPassword = () => {
 
   const onSubmit = async (data: ResetFormValues) => {
     try {
-      console.log("Reset payload:", data);
-
       const res = await resetPassword(data);
 
       toast.success(res?.message || "Password reset successful");
@@ -76,6 +88,19 @@ const ResetPassword = () => {
       <p className="text-center mt-10 text-muted-foreground">Invalid request</p>
     );
   }
+
+  const handle_resend_otp = async () => {
+    if (timer > 0) return;
+
+    try {
+      await resendOtp({ email });
+      toast.success("OTP resent successfully");
+
+      setTimer(60);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to resend OTP");
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40">
@@ -138,6 +163,20 @@ const ResetPassword = () => {
               {isSubmitting ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
+
+          <div className="text-center text-muted-foreground">
+            Don&apos;t received OTP?
+            <Button
+              variant="link"
+              size="sm"
+              type="button"
+              onClick={handle_resend_otp}
+              disabled={timer > 0}
+              className={timer > 0 ? "opacity-60 cursor-not-allowed" : ""}
+            >
+              {timer > 0 ? `Resend in ${timer}s` : "Resend OTP"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

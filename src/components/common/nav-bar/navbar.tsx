@@ -19,7 +19,6 @@ const Navbar = () => {
   const router = useRouter();
   const { data, isLoading } = useGetMe();
   const user = data?.data;
-  console.log("user: ", user);
 
   if (isLoading) {
     return (
@@ -37,7 +36,6 @@ const Navbar = () => {
     }
   };
 
-  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <Container>

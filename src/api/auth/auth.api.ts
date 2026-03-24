@@ -116,3 +116,22 @@ export const useResetPassword = () => {
     },
   });
 };
+
+
+// ! resend OTP
+const resendOtpApi = async (payload: { email: string }) => {
+  const { data } = await api.post("/auth/resend_otp", payload);
+  return data;
+}
+
+
+// ! resend OTP hook
+export const useResendOtp = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: resendOtpApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};

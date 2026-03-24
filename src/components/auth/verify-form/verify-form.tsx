@@ -1,6 +1,6 @@
 "use client";
 
-import { useVerify } from "@/api/auth/auth.api";
+import { useResendOtp, useVerify } from "@/api/auth/auth.api";
 import { Button } from "@/components/ui/button";
 import {
   InputOTP,
@@ -8,10 +8,11 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const VerifyForm = () => {
+  const [timer, setTimer] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -22,6 +23,7 @@ const VerifyForm = () => {
 
   const { mutateAsync: verifyUser, isPending } = useVerify();
 
+  const { mutateAsync: resendOtp } = useResendOtp();
   const handleVerify = async () => {
     if (!otp || otp.length < 6) {
       return toast.error("Enter valid OTP");
@@ -34,7 +36,6 @@ const VerifyForm = () => {
       };
       const res = await verifyUser(payload);
 
-      console.log("res: ", res);
       toast.success(
         res?.message || "Verified successfully! You can now log in.",
       );
@@ -46,6 +47,32 @@ const VerifyForm = () => {
     }
   };
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handle_resend_otp = async () => {
+    if (timer > 0) return;
+    const data = {
+      email: email as string,
+    };
+    try {
+      await resendOtp(data);
+      toast.success("OTP resent successfully");
+
+      setTimer(60);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to resend OTP");
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40">
       <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-xl space-y-6">
@@ -80,13 +107,20 @@ const VerifyForm = () => {
           {isPending ? "Verifying..." : "Verify"}
         </Button>
 
-        {/* Resend (UI only এখন) */}
-        <p className="text-center text-sm text-muted-foreground">
-          Didn’t receive code?{" "}
-          <span className="text-emerald-500 cursor-pointer hover:underline">
-            Resend
-          </span>
-        </p>
+        {/* Resend */}
+        <div className="text-center text-muted-foreground">
+          Don&apos;t received OTP?
+          <Button
+            variant="link"
+            size="sm"
+            type="button"
+            onClick={handle_resend_otp}
+            disabled={timer > 0}
+            className={timer > 0 ? "opacity-60 cursor-not-allowed" : ""}
+          >
+            {timer > 0 ? `Resend in ${timer}s` : "Resend OTP"}
+          </Button>
+        </div>
       </div>
     </div>
   );
