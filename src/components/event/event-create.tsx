@@ -37,7 +37,6 @@ import { cn } from "@/lib/utils";
 import FileUpload from "@/components/custom/file-upload";
 import FormInput from "@/components/custom/form-input";
 
-import { useGetMe } from "@/api/auth/auth.api";
 import { useCreateEvent } from "@/api/event/event.api";
 import {
   create_event_schema,
@@ -47,12 +46,12 @@ import {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  userData?: any
+  userData?: any;
 };
 
 const EventCreate = ({ open, onOpenChange, userData }: Props) => {
   const { mutateAsync: createEvent } = useCreateEvent();
-  
+
   const [file, setFile] = useState<File | null>(null);
 
   const {
@@ -193,6 +192,9 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
                           }
                         }}
                         initialFocus
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
                       />
                     </PopoverContent>
                   </Popover>

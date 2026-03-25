@@ -155,19 +155,19 @@ export const useCreateEvent = () => {
   });
 };
 
-// todo UPDATE Event
-const updateEventApi = async (payload: {
+type UpdateEventPayload = {
   id: string;
-  event_title: string;
-  event_image: File | null;
-  event_date: string;
-  event_time: string;
-  event_venue: string;
-  event_description: string;
-  event_status: "active" | "in_active";
-  is_paid: boolean;
-}) => {
-  const { data } = await api.patch(`/event/${payload.id}`, payload);
+  formData: FormData;
+};
+
+// todo UPDATE Event
+const updateEventApi = async ({ id, formData }: UpdateEventPayload) => {
+  const { data } = await api.patch(`/event/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return data;
 };
 

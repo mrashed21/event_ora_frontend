@@ -8,6 +8,7 @@ import Header from "../custom/header";
 import { SearchField } from "../custom/search-field";
 import EventCreate from "./event-create";
 import EventTable from "./event-table";
+import EventUpdate from "./event-update";
 
 const Event = () => {
   const [page, set_page] = useState(1);
@@ -70,6 +71,12 @@ const Event = () => {
         open={create_modal}
         onOpenChange={set_create_modal}
         userData={userData}
+      />
+
+      <EventUpdate
+        open={update_modal}
+        onOpenChange={set_update_modal}
+        eventData={selected_event}
       />
     </section>
   );
