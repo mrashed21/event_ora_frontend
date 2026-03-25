@@ -1,4 +1,5 @@
 import {
+  CalendarPlus,
   LayoutDashboard,
   Package,
   Settings,
@@ -76,5 +77,11 @@ export const sidebarItems: SidebarItem[] = [
     icon: User,
     path: "/dashboard/profile",
     roles: ["user", "admin", "super_admin"],
+  },
+  {
+    title: "Event",
+    icon: CalendarPlus,
+    path: "/admin/event",
+    roles: ["admin", "super_admin"],
   },
 ];
