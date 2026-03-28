@@ -5,6 +5,7 @@ import useSerial from "@/hooks/serial-number";
 import { useState } from "react";
 import CreateButton from "../custom/create-button";
 import Header from "../custom/header";
+import Pagination from "../custom/pagination";
 import { SearchField } from "../custom/search-field";
 import EventCreate from "./event-create";
 import EventTable from "./event-table";
@@ -19,11 +20,7 @@ const Event = () => {
   const [selected_event, set_selected_event] = useState(null);
 
   const { data: userData } = useGetMe();
-  const {
-    data: eventData,
-    isLoading,
-    error,
-  } = useEventsUser({
+  const { data: eventData, isLoading } = useEventsUser({
     page,
     limit,
     search_term,
@@ -41,8 +38,8 @@ const Event = () => {
       <div className="w-full max-w-full overflow-hidden">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-5">
           <Header
-            title="All Events"
-            description="Manage and search all events here"
+            title="My Events"
+            description="Manage and search your events here"
           />
           <CreateButton
             label="Add Event"
@@ -53,7 +50,7 @@ const Event = () => {
 
       <div className="w-full max-w-sm overflow-hidden">
         <SearchField
-          placeholder="Search events..."
+          placeholder="Search your events..."
           onSearch={(v) => {
             set_page(1);
             set_search_term(v);
@@ -65,6 +62,14 @@ const Event = () => {
         isLoading={isLoading}
         serial={serial}
         handleUpdate={handleUpdate}
+      />
+
+      <Pagination
+        page={page}
+        limit={limit}
+        total={eventData?.data?.meta?.total}
+        setPage={set_page}
+        setLimit={set_limit}
       />
 
       <EventCreate

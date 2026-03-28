@@ -1,6 +1,7 @@
 import {
   CalendarPlus,
   LayoutDashboard,
+  ListChecks,
   Package,
   Settings,
   Shield,
@@ -82,6 +83,12 @@ export const sidebarItems: SidebarItem[] = [
     title: "Event",
     icon: CalendarPlus,
     path: "/admin/event",
+    roles: ["admin", "super_admin"],
+  },
+   {
+    title: "All Event",
+    icon: ListChecks,
+    path: "/admin/all-event",
     roles: ["admin", "super_admin"],
   },
 ];
