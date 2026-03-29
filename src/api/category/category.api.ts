@@ -7,44 +7,31 @@ export type CategoryResponse = ApiResponse<CategoryInterface>;
 
 export interface CategoryInterface {
   id: string;
-  category_type: string;
+  category_title: string;
+  category_type: "public" | "private";
   category_description: string | null;
+  category_image: string | null;
   is_paid: boolean;
   category_status: "active" | "in_active";
   created_at: string;
   updated_at: string;
 }
 
-//* GET Category (pagination + search_term)
-const getCategoriesApi = async ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
-  const params: any = { page, limit };
-
-  if (search_term?.trim()) {
-    params.search_term = search_term;
-  }
-
-  const { data } = await api.get("/category", { params });
+//* GET public categories
+const getCategoriesApi = async () => {
+  const { data } = await api.get("/category");
   return data;
 };
 
-//* GET Categories hook
-export const useCategories = ({
-  page = 1,
-  limit = 10,
-  search_term,
-}: GetPaginationParams) => {
+//* GET public categories hook
+export const useCategories = () => {
   return useQuery({
-    queryKey: ["categories", page, limit, search_term],
-    queryFn: () => getCategoriesApi({ page, limit, search_term }),
-    // keepPreviousData: true,
+    queryKey: ["categories-public"],
+    queryFn: getCategoriesApi,
   });
 };
 
-//* GET Category (pagination + search_term) admin
+//* GET admin categories
 const getCategoriesAdminApi = async ({
   page = 1,
   limit = 10,
@@ -60,27 +47,25 @@ const getCategoriesAdminApi = async ({
   return data;
 };
 
-//* GET Categories hook
+//* GET admin categories hook
 export const useCategoriesAdmin = ({
   page = 1,
   limit = 10,
   search_term,
 }: GetPaginationParams) => {
   return useQuery({
-    queryKey: ["categories", page, limit, search_term],
+    queryKey: ["categories-admin", page, limit, search_term],
     queryFn: () => getCategoriesAdminApi({ page, limit, search_term }),
-    // keepPreviousData: true,
   });
 };
 
 //? create Category
-const createCategoryApi = async (payload: {
-  category_type: string;
-  category_description: string | null;
-  category_status: "active" | "in_active";
-  is_paid: boolean;
-}) => {
-  const { data } = await api.post("/category", payload);
+const createCategoryApi = async (payload: FormData) => {
+  const { data } = await api.post("/category", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data;
 };
 
@@ -91,20 +76,25 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: createCategoryApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-admin"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-public"] });
     },
   });
 };
 
-// todo UPDATE Category
-const updateCategoryApi = async (payload: {
+//todo UPDATE Category
+const updateCategoryApi = async ({
+  id,
+  payload,
+}: {
   id: string;
-  category_type: string;
-  category_description: string | null;
-  category_status: "active" | "in_active";
-  is_paid: boolean;
+  payload: FormData;
 }) => {
-  const { data } = await api.patch(`/category/${payload.id}`, payload);
+  const { data } = await api.patch(`/category/${id}`, payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data;
 };
 
@@ -115,7 +105,8 @@ export const useUpdateCategory = () => {
   return useMutation({
     mutationFn: updateCategoryApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-admin"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-public"] });
     },
   });
 };
@@ -133,7 +124,8 @@ export const useDeleteCategory = () => {
   return useMutation({
     mutationFn: deleteCategoryApi,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-admin"] });
+      queryClient.invalidateQueries({ queryKey: ["categories-public"] });
     },
   });
 };

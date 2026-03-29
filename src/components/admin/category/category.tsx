@@ -32,7 +32,7 @@ const Category = () => {
   const handleUpdate = (item: any) => {
     set_selected_category(item);
     set_update_modal(true);
-  }
+  };
   return (
     <section className="space-y-6 w-full">
       <div className="w-full max-w-full overflow-hidden">

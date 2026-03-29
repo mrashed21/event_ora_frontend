@@ -1,21 +1,32 @@
 "use client";
 
+import { Loader2, PanelTopDashed, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import {
   CategoryInterface,
   useDeleteCategory,
 } from "@/api/category/category.api";
-import TableSkeleton from "@/components/skeleton/table-skeleton";
 
+import TableSkeleton from "@/components/skeleton/table-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
+import DescriptionModal from "@/components/custom/description-modal";
 import {
   Table,
   TableBody,
@@ -24,10 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { PanelTopDashed, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { formatDate } from "@/hooks/date-format";
 
 interface Props {
   data: CategoryInterface[];
@@ -37,10 +45,13 @@ interface Props {
 }
 
 const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
-  const { mutateAsync: deleteCategory } = useDeleteCategory();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState("");
+
+  const { mutateAsync: deleteCategory, isPending: isDeleting } =
+    useDeleteCategory();
 
   if (isLoading) {
     return <TableSkeleton />;
@@ -52,26 +63,39 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   };
 
   const handleDelete = async (id: string) => {
+    const toastId = toast.loading("Deleting category...");
+    setDeletingId(id);
+
     try {
       const res = await deleteCategory(id);
-      toast.success(res?.message || "Category deleted successfully!");
+
+      toast.success(res?.message || "Category deleted successfully!", {
+        id: toastId,
+      });
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message || "Failed to delete category",
+        {
+          id: toastId,
+        },
       );
+    } finally {
+      setDeletingId(null);
     }
   };
 
   return (
-    <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
       <Table>
         {/* Header */}
         <TableHeader>
           <TableRow>
-            <TableHead>#</TableHead>
+            <TableHead className="w-15">#</TableHead>
+            <TableHead>Image</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Description</TableHead>
             <TableHead>Type</TableHead>
+            <TableHead>Pricing</TableHead>
+            <TableHead>Description</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -80,15 +104,52 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
 
         {/* Body */}
         <TableBody>
-          {data.length > 0 ? (
-            data.map((category, index) => (
-              <TableRow key={category.id}>
+          {data?.length > 0 ? (
+            data?.map((category, index) => (
+              <TableRow key={category?.id}>
                 {/* Serial */}
                 <TableCell className="font-medium">{serial(index)}</TableCell>
 
+                {/* Category Info */}
+
+                <TableCell>
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="relative h-11 w-11 overflow-hidden rounded-lg border bg-muted">
+                      {category?.category_image ? (
+                        <Image
+                          src={category?.category_image}
+                          alt={category?.category_title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                          N/A
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TableCell>
+
+                <TableCell className="capitalize">
+                  {category?.category_title}
+                </TableCell>
+
                 {/* Category Type */}
-                <TableCell className="font-medium capitalize">
-                  {category.category_type}
+                <TableCell>
+                  <Badge variant="outline" className="capitalize">
+                    {category?.category_type}
+                  </Badge>
+                </TableCell>
+
+                {/* Pricing */}
+                <TableCell>
+                  <Badge
+                    variant={category?.is_paid ? "default" : "secondary"}
+                    className="capitalize"
+                  >
+                    {category?.is_paid ? "Paid" : "Free"}
+                  </Badge>
                 </TableCell>
 
                 {/* Description */}
@@ -98,24 +159,15 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
                     size="icon"
                     onClick={() =>
                       handleDescriptionClick(
-                        category.category_description || "",
+                        category?.category_description || "",
                       )
                     }
                   >
-                    <PanelTopDashed className="w-4 h-4" />
+                    <PanelTopDashed className="h-4 w-4" />
                   </Button>
                 </TableCell>
 
-                <TableCell>
-                  <Badge
-                    variant={category.is_paid ? "default" : "outline"}
-                    className="capitalize"
-                  >
-                    {category.is_paid ? "Paid" : "Free"}
-                  </Badge>
-                </TableCell>
-
-                {/* Status  */}
+                {/* Status */}
                 <TableCell>
                   <Badge
                     variant={
@@ -132,35 +184,70 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
                 </TableCell>
 
                 {/* Created */}
-                <TableCell>
-                  {new Date(category.created_at).toLocaleDateString()}
-                </TableCell>
+                <TableCell>{formatDate(category.created_at)}</TableCell>
 
                 {/* Actions */}
-                <TableCell className="text-right flex items-center justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleUpdate(category)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleUpdate(category)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
 
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleDelete(category.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          disabled={deletingId === category?.id}
+                          variant="destructive"
+                          size="icon"
+                        >
+                          {deletingId === category?.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete this category?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete{" "}
+                            <span className="font-medium text-foreground">
+                              {" "}
+                              {category?.category_title}
+                            </span>
+                            .
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(category?.id)}
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? "Deleting..." : "Delete"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
               <TableCell
-                colSpan={6}
-                className="text-center py-10 text-muted-foreground"
+                colSpan={8}
+                className="py-12 text-center text-muted-foreground"
               >
                 No categories found
               </TableCell>
@@ -180,33 +267,3 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
 };
 
 export default CategoryTable;
-
-const DescriptionModal = ({
-  open,
-  onOpenChange,
-  description,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  description: string;
-}) => {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Category Description</DialogTitle>
-        </DialogHeader>
-
-        <div className="p-4 text-sm text-muted-foreground capitalize">
-          {description || "No description provided."}
-        </div>
-
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
