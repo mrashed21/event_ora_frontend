@@ -29,6 +29,9 @@ export interface EventInterface {
   user_id: string;
   created_at: string;
   updated_at: string;
+  _count?: {
+    participants: number;
+  };
 }
 
 //* GET Events (pagination + search_term)
