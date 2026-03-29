@@ -18,7 +18,6 @@ const AllEvent = () => {
     search_term,
   });
 
-
   const serial = useSerial(page, limit);
 
   return (

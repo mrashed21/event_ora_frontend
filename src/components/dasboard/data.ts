@@ -82,8 +82,8 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Event",
     icon: CalendarPlus,
-    path: "/admin/event",
-    roles: ["admin", "super_admin"],
+    path: "/user/event",
+    roles: ["user"],
   },
    {
     title: "All Event",

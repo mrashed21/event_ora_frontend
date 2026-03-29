@@ -12,7 +12,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
 import {
   Control,
   Controller,
@@ -23,7 +24,7 @@ import {
 
 export type ComboboxOption = {
   label: string;
-  value: string;
+  id: string;
 };
 
 type FormComboboxProps<T extends FieldValues> = {
@@ -45,61 +46,74 @@ const FormCombobox = <T extends FieldValues>({
   disabled = false,
   rules,
 }: FormComboboxProps<T>) => {
+  const [open, setOpen] = useState(false);
+
   return (
     <Controller
       name={name}
       control={control}
       rules={rules}
-      render={({ field }) => (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              disabled={disabled}
-              className={cn(
-                "w-full justify-between capitalize",
-                !field.value && "text-muted-foreground font-normal",
-              )}
+      render={({ field }) => {
+        const selectedOption = options.find(
+          (option) => option.id === field.value,
+        );
+
+        return (
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                disabled={disabled}
+                className={cn(
+                  "w-full justify-between capitalize",
+                  !field.value && "text-muted-foreground font-normal",
+                )}
+              >
+                <span className="truncate">
+                  {selectedOption?.label || placeholder}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent
+              align="start"
+              className="w-[--radix-popover-trigger-width] p-0"
             >
-              {field.value?.label || placeholder}
-            </Button>
-          </PopoverTrigger>
+              <Command>
+                <CommandInput placeholder={searchPlaceholder} />
+                <CommandEmpty>No option found.</CommandEmpty>
 
-          <PopoverContent
-            align="start"
-            className="w-[--radix-popover-trigger-width] p-0"
-          >
-            <Command>
-              <CommandInput placeholder={searchPlaceholder} />
-              <CommandEmpty>No option found.</CommandEmpty>
-
-              <CommandGroup>
-                {options?.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.label}
-                    className="capitalize"
-                    onSelect={() => {
-                      field.onChange(option);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        field.value?.value === option.value
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                    />
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      )}
+                <CommandGroup>
+                  {options?.map((option) => (
+                    <CommandItem
+                      key={option.id}
+                      value={option.label}
+                      className="capitalize"
+                      onSelect={() => {
+                        field.onChange(option.id); 
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          field.value === option.id
+                            ? "opacity-100"
+                            : "opacity-0",
+                        )}
+                      />
+                      {option.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        );
+      }}
     />
   );
 };

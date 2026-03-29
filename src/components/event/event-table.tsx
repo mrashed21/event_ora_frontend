@@ -61,7 +61,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   };
 
   return (
-    <div className=" rounded-xl border bg-white shadow-sm">
+    <div className="rounded-xl border bg-white shadow-sm overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -71,7 +71,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
             <TableHead>Description</TableHead>
             <TableHead>Venue</TableHead>
             <TableHead>Date & Time</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Fee</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
@@ -83,115 +83,150 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
 
         <TableBody>
           {data.length > 0 ? (
-            data.map((event, index) => (
-              <TableRow key={event.id}>
-                <TableCell className="font-medium">{serial(index)}</TableCell>
+            data.map((event, index) => {
+              const isPaid = event?.category?.is_paid === true;
+              const categoryType = event?.category?.category_type || "—";
+              const categoryTitle = event?.category?.category_title || "—";
 
-                <TableCell>
-                  {event?.event_image ? (
-                    <img
-                      src={event.event_image}
-                      alt={event.event_title}
-                      className="h-14 w-14 rounded-md object-cover border"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-md border text-xs text-muted-foreground">
-                      No Image
+              return (
+                <TableRow key={event.id}>
+                  <TableCell className="font-medium">{serial(index)}</TableCell>
+
+                  {/* Image */}
+                  <TableCell>
+                    {event?.event_image ? (
+                      <img
+                        src={event.event_image}
+                        alt={event.event_title}
+                        className="h-14 w-14 rounded-md object-cover border"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 items-center justify-center rounded-md border text-xs text-muted-foreground">
+                        No Image
+                      </div>
+                    )}
+                  </TableCell>
+
+                  {/* Title */}
+                  <TableCell>
+                    <div className="font-medium line-clamp-1 max-w-45">
+                      {event.event_title}
                     </div>
-                  )}
-                </TableCell>
+                  </TableCell>
 
-                <TableCell>{event.event_title}</TableCell>
-
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      handleDescriptionClick(event.event_description || "")
-                    }
-                  >
-                    <PanelTopDashed className="w-4 h-4" />
-                  </Button>
-                </TableCell>
-
-                <TableCell>{event.event_venue || "—"}</TableCell>
-
-                <TableCell>
-                  <div>{formatDate(event.event_date)}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatTime(event.event_time) || "—"}
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <Badge variant="outline" className="capitalize">
-                    {event.event_type}
-                  </Badge>
-                </TableCell>
-
-                <TableCell>
-                  {event.is_paid ? (
-                    <div>
-                      <span className="font-medium">
-                        ৳ {event.registration_fee}
-                      </span>
-                      <div className="text-xs text-muted-foreground">Paid</div>
-                    </div>
-                  ) : (
-                    <Badge variant="secondary">Free</Badge>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  <Badge
-                    variant={
-                      event.event_status === "active" ? "default" : "secondary"
-                    }
-                    className="capitalize"
-                  >
-                    {event.event_status.replace("_", " ")}
-                  </Badge>
-                </TableCell>
-
-                <TableCell>{event.total_joined ?? 0}</TableCell>
-
-                <TableCell>
-                  <div className="font-medium">{event.user?.name || "—"}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {event.user?.email || "—"}
-                  </div>
-                </TableCell>
-
-                <TableCell>{formatDate(event.created_at)}</TableCell>
-
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
+                  {/* Description */}
+                  <TableCell>
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleUpdate(event)}
-                      disabled={deletingId === event.id}
+                      onClick={() =>
+                        handleDescriptionClick(event.event_description || "")
+                      }
                     >
-                      <Pencil className="w-4 h-4" />
+                      <PanelTopDashed className="w-4 h-4" />
                     </Button>
+                  </TableCell>
 
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => handleDelete(event.id)}
-                      disabled={deletingId === event.id}
+                  {/* Venue */}
+                  <TableCell>
+                    <div className="line-clamp-1 max-w-35">
+                      {event.event_venue || "—"}
+                    </div>
+                  </TableCell>
+
+                  {/* Date + Time */}
+                  <TableCell>
+                    <div>{formatDate(event.event_date)}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatTime(event.event_time) || "—"}
+                    </div>
+                  </TableCell>
+
+                  {/* Category */}
+                  <TableCell>
+                    <div className="font-medium capitalize">
+                      {categoryTitle}
+                    </div>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {categoryType}
+                    </div>
+                  </TableCell>
+
+                  {/* Fee */}
+                  <TableCell>
+                    {isPaid ? (
+                      <div>
+                        <span className="font-medium">
+                          ৳ {event.registration_fee ?? 0}
+                        </span>
+                        <div className="text-xs text-muted-foreground">
+                          Paid
+                        </div>
+                      </div>
+                    ) : (
+                      <Badge variant="secondary">Free</Badge>
+                    )}
+                  </TableCell>
+
+                  {/* Status */}
+                  <TableCell>
+                    <Badge
+                      variant={
+                        event.event_status === "active"
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="capitalize"
                     >
-                      {deletingId === event.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
+                      {event.event_status?.replace("_", " ") || "—"}
+                    </Badge>
+                  </TableCell>
+
+                  {/* Joined */}
+                  <TableCell>{event.total_joined ?? 0}</TableCell>
+
+                  {/* Organizer */}
+                  <TableCell>
+                    <div className="font-medium line-clamp-1 max-w-45">
+                      {event.user?.name || "—"}
+                    </div>
+                    <div className="text-sm text-muted-foreground line-clamp-1 max-w-45">
+                      {event.user?.email || "—"}
+                    </div>
+                  </TableCell>
+
+                  {/* Created At */}
+                  <TableCell>{formatDate(event.created_at)}</TableCell>
+
+                  {/* Actions */}
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleUpdate(event)}
+                        disabled={deletingId === event.id}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDelete(event.id)}
+                        disabled={deletingId === event.id}
+                      >
+                        {deletingId === event.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell

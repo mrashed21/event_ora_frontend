@@ -14,21 +14,57 @@ export interface EventInterface {
   event_venue: string;
   event_description: string;
   event_status: "active" | "in_active";
-  event_type: "public" | "private";
-  is_paid?: boolean;
   is_featured?: boolean;
-  user:
-    | {
-        id: string;
-        name: string;
-        email: string;
-      }
-    | any;
-  total_joined?: number;
   registration_fee: number | null;
-  user_id: string;
+  category_id: string;
+  organizer_id: string;
+  userId: string | null;
   created_at: string;
   updated_at: string;
+  joined_participants?:any[];
+
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+  } | null;
+
+  organizer?: {
+    id: string;
+    user_name: string;
+    user_email: string;
+    contact_number?: string | null;
+    profile_photo?: string | null;
+  } | null;
+
+  category?: {
+    id: string;
+    category_title?: string;
+    category_name?: string;
+    category_type?: string;
+    is_paid?: boolean;
+    category_image?: string | null;
+    category_description?: string;
+    category_status?: string;
+    created_at?: string;
+    updated_at?: string;
+  } | null;
+
+  participants?: {
+    id: string;
+    participant_id: string;
+    registered_at: string;
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+      image?: string | null;
+    };
+  }[];
+
+  total_joined?: number;
+
   _count?: {
     participants: number;
   };
@@ -59,7 +95,6 @@ export const useEvents = ({
   return useQuery({
     queryKey: ["events", page, limit, search_term],
     queryFn: () => getEventsApi({ page, limit, search_term }),
-    // keepPreviousData: true,
   });
 };
 
@@ -74,6 +109,7 @@ export const useEventById = (id: string) => {
   return useQuery({
     queryKey: ["event", id],
     queryFn: () => getEventByIdApi(id),
+    enabled: !!id,
   });
 };
 
@@ -87,7 +123,7 @@ const getFeaturedEventApi = async () => {
 export const useFeaturedEvent = () => {
   return useQuery({
     queryKey: ["featured-event"],
-    queryFn: () => getFeaturedEventApi(),
+    queryFn: getFeaturedEventApi,
   });
 };
 
@@ -101,7 +137,7 @@ const getUpComingEventApi = async () => {
 export const useUpComingEvent = () => {
   return useQuery({
     queryKey: ["up-coming-event"],
-    queryFn: () => getUpComingEventApi(),
+    queryFn: getUpComingEventApi,
   });
 };
 
@@ -128,9 +164,8 @@ export const useEventsUser = ({
   search_term,
 }: GetPaginationParams) => {
   return useQuery({
-    queryKey: ["events", page, limit, search_term],
+    queryKey: ["user-events", page, limit, search_term],
     queryFn: () => getEventsUserApi({ page, limit, search_term }),
-    // keepPreviousData: true,
   });
 };
 
@@ -157,9 +192,8 @@ export const useEventsAdmin = ({
   search_term,
 }: GetPaginationParams) => {
   return useQuery({
-    queryKey: ["events", page, limit, search_term],
+    queryKey: ["admin-events", page, limit, search_term],
     queryFn: () => getEventsAdminApi({ page, limit, search_term }),
-    // keepPreviousData: true,
   });
 };
 
@@ -183,6 +217,10 @@ export const useCreateEvent = () => {
     mutationFn: createEventApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["user-events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["featured-event"] });
+      queryClient.invalidateQueries({ queryKey: ["up-coming-event"] });
     },
   });
 };
@@ -209,8 +247,13 @@ export const useUpdateEvent = () => {
 
   return useMutation({
     mutationFn: updateEventApi,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["user-events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["featured-event"] });
+      queryClient.invalidateQueries({ queryKey: ["up-coming-event"] });
+      queryClient.invalidateQueries({ queryKey: ["event", variables.id] });
     },
   });
 };
@@ -229,6 +272,10 @@ export const useDeleteEvent = () => {
     mutationFn: deleteEventApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["user-events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["featured-event"] });
+      queryClient.invalidateQueries({ queryKey: ["up-coming-event"] });
     },
   });
 };

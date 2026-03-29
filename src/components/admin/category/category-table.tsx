@@ -92,7 +92,7 @@ const CategoryTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
           <TableRow>
             <TableHead className="w-15">#</TableHead>
             <TableHead>Image</TableHead>
-            <TableHead>Category</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Pricing</TableHead>
             <TableHead>Description</TableHead>

@@ -27,7 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate, formatTime } from "@/hooks/date-format";
-import { Loader2, PanelTopDashed, Pencil, Star, Trash2 } from "lucide-react";
+import { Loader2, PanelTopDashed, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import DescriptionModal from "../custom/description-modal";
@@ -119,7 +119,7 @@ const AllEventTable = ({ data, isLoading, serial }: Props) => {
   };
 
   return (
-    <section className="relative w-full  rounded-lg border shadow-md">
+    <section className="relative w-full rounded-lg border shadow-md bg-white">
       <div className="overflow-x-auto">
         <Table className="min-w-full">
           <TableHeader>
@@ -130,7 +130,7 @@ const AllEventTable = ({ data, isLoading, serial }: Props) => {
               <TableHead>Description</TableHead>
               <TableHead>Venue</TableHead>
               <TableHead>Date & Time</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Fee</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Featured</TableHead>
@@ -143,141 +143,175 @@ const AllEventTable = ({ data, isLoading, serial }: Props) => {
 
           <TableBody>
             {data.length > 0 ? (
-              data.map((event, index) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{serial(index)}</TableCell>
+              data.map((event, index) => {
+                const isPaid = event?.category?.is_paid === true;
+                const categoryTitle = event?.category?.category_title || "—";
+                const categoryType = event?.category?.category_type || "—";
 
-                  <TableCell>
-                    {event?.event_image ? (
-                      <img
-                        src={event.event_image}
-                        alt={event.event_title}
-                        className="h-14 w-14 rounded-md object-cover border"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-md border text-xs text-muted-foreground">
-                        No Image
-                      </div>
-                    )}
-                  </TableCell>
+                return (
+                  <TableRow key={event.id}>
+                    <TableCell className="font-medium">
+                      {serial(index)}
+                    </TableCell>
 
-                  <TableCell>{event.event_title}</TableCell>
-
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        handleDescriptionClick(event.event_description || "")
-                      }
-                    >
-                      <PanelTopDashed className="w-4 h-4" />
-                    </Button>
-                  </TableCell>
-
-                  <TableCell>{event.event_venue || "—"}</TableCell>
-
-                  <TableCell>
-                    <div>{formatDate(event.event_date)}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatTime(event.event_time) || "—"}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge variant="outline" className="capitalize">
-                      {event.event_type}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell>
-                    {event.is_paid ? (
-                      <div>
-                        <span className="font-medium">
-                          ৳ {event.registration_fee}
-                        </span>
-                        <div className="text-xs text-muted-foreground">
-                          Paid
+                    {/* Image */}
+                    <TableCell>
+                      {event?.event_image ? (
+                        <img
+                          src={event.event_image}
+                          alt={event.event_title}
+                          className="h-14 w-14 rounded-md object-cover border"
+                        />
+                      ) : (
+                        <div className="flex h-14 w-14 items-center justify-center rounded-md border text-xs text-muted-foreground">
+                          No Image
                         </div>
+                      )}
+                    </TableCell>
+
+                    {/* Title */}
+                    <TableCell>
+                      <div className="font-medium line-clamp-1 max-w-45">
+                        {event.event_title}
                       </div>
-                    ) : (
-                      <Badge variant="secondary">Free</Badge>
-                    )}
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell>
-                    <Badge
-                      variant={
-                        event.event_status === "active"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className="capitalize"
-                    >
-                      {event.event_status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
+                    {/* Description */}
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() =>
+                          handleDescriptionClick(event.event_description || "")
+                        }
+                      >
+                        <PanelTopDashed className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
 
-                  <TableCell>
-                    {event.is_featured ? (
-                      <Badge className="gap-1 bg-amber-500 hover:bg-amber-500 text-white">
-                        <Star className="w-3.5 h-3.5 fill-white" />
-                        Featured
+                    {/* Venue */}
+                    <TableCell>
+                      <div className="line-clamp-1 max-w-35">
+                        {event.event_venue || "—"}
+                      </div>
+                    </TableCell>
+
+                    {/* Date + Time */}
+                    <TableCell>
+                      <div>{formatDate(event.event_date)}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatTime(event.event_time) || "—"}
+                      </div>
+                    </TableCell>
+
+                    {/* Category */}
+                    <TableCell>
+                      <div className="font-medium capitalize">
+                        {categoryTitle}
+                      </div>
+                      <div className="text-xs text-muted-foreground capitalize">
+                        {categoryType}
+                      </div>
+                    </TableCell>
+
+                    {/* Fee */}
+                    <TableCell>
+                      {isPaid ? (
+                        <div>
+                          <span className="font-medium">
+                            ৳ {event.registration_fee ?? 0}
+                          </span>
+                          <div className="text-xs text-muted-foreground">
+                            Paid
+                          </div>
+                        </div>
+                      ) : (
+                        <Badge variant="secondary">Free</Badge>
+                      )}
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      <Badge
+                        variant={
+                          event.event_status === "active"
+                            ? "default"
+                            : "secondary"
+                        }
+                        className="capitalize"
+                      >
+                        {event.event_status?.replace("_", " ") || "—"}
                       </Badge>
-                    ) : (
-                      <Badge variant="outline">No</Badge>
-                    )}
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell>{event.total_joined ?? 0}</TableCell>
+                    {/* Featured */}
+                    <TableCell>
+                      {event.is_featured ? (
+                        <Badge className="gap-1 bg-amber-500 hover:bg-amber-500 text-white">
+                          <Star className="w-3.5 h-3.5 fill-white" />
+                          Featured
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">No</Badge>
+                      )}
+                    </TableCell>
 
-                  <TableCell>
-                    <div className="font-medium">{event.user?.name || "—"}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {event.user?.email || "—"}
-                    </div>
-                  </TableCell>
+                    {/* Joined */}
+                    <TableCell>{event.total_joined ?? 0}</TableCell>
 
-                  <TableCell>{formatDate(event.created_at)}</TableCell>
+                    {/* Organizer */}
+                    <TableCell>
+                      <div className="font-medium line-clamp-1 max-w-45">
+                        {event.user?.name || "—"}
+                      </div>
+                      <div className="text-sm text-muted-foreground line-clamp-1 max-w-45">
+                        {event.user?.email || "—"}
+                      </div>
+                    </TableCell>
 
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant={event.is_featured ? "secondary" : "outline"}
-                        size="icon"
-                        onClick={() => openUpdateConfirm(event)}
-                        disabled={
-                          deletingId === event.id || updatingId === event.id
-                        }
-                        title={
-                          event.is_featured
-                            ? "Remove from featured"
-                            : "Make featured"
-                        }
-                      >
-                        {updatingId === event.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Pencil className="w-4 h-4" />
-                        )}
-                      </Button>
+                    {/* Created At */}
+                    <TableCell>{formatDate(event.created_at)}</TableCell>
 
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDelete(event.id)}
-                        disabled={deletingId === event.id}
-                      >
-                        {deletingId === event.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                    {/* Actions */}
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant={event.is_featured ? "secondary" : "outline"}
+                          size="icon"
+                          onClick={() => openUpdateConfirm(event)}
+                          disabled={
+                            deletingId === event.id || updatingId === event.id
+                          }
+                          title={
+                            event.is_featured
+                              ? "Remove from featured"
+                              : "Make featured"
+                          }
+                        >
+                          {updatingId === event.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Star className="w-4 h-4" />
+                          )}
+                        </Button>
+
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDelete(event.id)}
+                          disabled={deletingId === event.id}
+                        >
+                          {deletingId === event.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell

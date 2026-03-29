@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -16,20 +16,11 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 import { cn } from "@/lib/utils";
@@ -37,29 +28,41 @@ import { cn } from "@/lib/utils";
 import FileUpload from "@/components/custom/file-upload";
 import FormInput from "@/components/custom/form-input";
 
+import { CategoryInterface } from "@/api/category/category.api";
 import { useCreateEvent } from "@/api/event/event.api";
-import {
-  create_event_schema,
-  type EventFormData,
-} from "@/schemas/event.shcema";
+import { create_event_schema, EventFormData } from "@/schemas/event.shcema";
+import FormCombobox from "../custom/form-combobox";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  categoryData?: CategoryInterface[];
   userData?: any;
 };
 
-const EventCreate = ({ open, onOpenChange, userData }: Props) => {
+const EventCreate = ({
+  open,
+  onOpenChange,
+  categoryData = [],
+  userData,
+}: Props) => {
   const { mutateAsync: createEvent } = useCreateEvent();
-
   const [file, setFile] = useState<File | null>(null);
+  console.log(userData);
+
+  const options = categoryData.map((category) => ({
+    id: category.id,
+    label: category.is_paid
+      ? `${category.category_title} ${category.category_type} - Paid`
+      : `${category.category_title} ${category.category_type} - Free`,
+  }));
 
   const {
     register,
     handleSubmit,
-    setValue,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<EventFormData>({
@@ -72,23 +75,27 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
       event_venue: "",
       event_description: "",
       event_status: "active",
-      event_type: "public",
-      is_paid: false,
+      category_id: "",
       registration_fee: undefined,
     },
   });
 
-  const selectedStatus = watch("event_status");
-  const selectedEventType = watch("event_type");
-  const isPaid = watch("is_paid");
+  const selectedCategoryId = watch("category_id");
+
+  const selectedCategory = useMemo(() => {
+    return categoryData.find((category) => category.id === selectedCategoryId);
+  }, [categoryData, selectedCategoryId]);
+
+  const isPaidCategory = !!selectedCategory?.is_paid;
 
   useEffect(() => {
-    if (!isPaid) {
+    if (!isPaidCategory) {
       setValue("registration_fee", undefined, {
         shouldValidate: true,
+        shouldDirty: true,
       });
     }
-  }, [isPaid, setValue]);
+  }, [isPaidCategory, setValue]);
 
   const onSubmit = async (data: EventFormData) => {
     try {
@@ -100,12 +107,10 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
       formData.append("event_venue", data.event_venue);
       formData.append("event_description", data.event_description);
       formData.append("event_status", data.event_status || "active");
-      formData.append("event_type", data.event_type || "public");
-      formData.append("user_id", userData?.data?.id || "");
-      formData.append("is_paid", String(data.is_paid ?? false));
+      formData.append("category_id", data.category_id);
 
       if (
-        data.is_paid &&
+        isPaidCategory &&
         data.registration_fee !== undefined &&
         data.registration_fee !== null
       ) {
@@ -113,7 +118,7 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
       }
 
       if (file) {
-        formData.append("file", file);
+        formData.append("event_image", file);
       }
 
       const res = await createEvent(formData);
@@ -227,55 +232,34 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
             error={errors.event_venue}
           />
 
-          {/* Event Type */}
+          {/* Category */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">Event Type</label>
-            <Select
-              value={selectedEventType}
-              onValueChange={(value) =>
-                setValue("event_type", value as "public" | "private", {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select event type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="private">Private</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.event_type && (
+            <label className="text-sm font-medium">Category</label>
+            <FormCombobox
+              name="category_id"
+              control={control}
+              options={options}
+              placeholder="Select category"
+              searchPlaceholder="Search categories..."
+              rules={{ required: "Category is required" }}
+            />
+            {errors.category_id && (
               <p className="text-sm text-red-500">
-                {errors.event_type.message}
+                {errors.category_id.message}
+              </p>
+            )}
+
+            {selectedCategory && (
+              <p className="text-xs text-muted-foreground">
+                {selectedCategory.is_paid
+                  ? "This category supports paid events."
+                  : "This category is free. Registration fee is not required."}
               </p>
             )}
           </div>
 
-          {/* Is Paid */}
-          <div className="flex items-center justify-between rounded-xl border p-4">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium">Paid Event</Label>
-              <p className="text-xs text-muted-foreground">
-                Enable this if users need to pay to join the event.
-              </p>
-            </div>
-
-            <Controller
-              control={control}
-              name="is_paid"
-              render={({ field }) => (
-                <Switch
-                  checked={field.value || false}
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-
-          {/* Registration Fee */}
-          {isPaid && (
+          {/* Registration Fee - show only if category is paid */}
+          {isPaidCategory && (
             <FormInput
               label="Registration Fee"
               name="registration_fee"
@@ -286,32 +270,6 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
               isNumber={true}
             />
           )}
-
-          {/* Event Status */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium">Event Status</label>
-            <Select
-              value={selectedStatus}
-              onValueChange={(value) =>
-                setValue("event_status", value as "active" | "in_active", {
-                  shouldValidate: true,
-                })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select event status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="in_active">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.event_status && (
-              <p className="text-sm text-red-500">
-                {errors.event_status.message}
-              </p>
-            )}
-          </div>
 
           {/* Description */}
           <div className="space-y-1">

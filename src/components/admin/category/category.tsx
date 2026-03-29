@@ -3,6 +3,7 @@
 import { useCategoriesAdmin } from "@/api/category/category.api";
 import CreateButton from "@/components/custom/create-button";
 import Header from "@/components/custom/header";
+import Pagination from "@/components/custom/pagination";
 import { SearchField } from "@/components/custom/search-field";
 import useSerial from "@/hooks/serial-number";
 import { useState } from "react";
@@ -18,15 +19,16 @@ const Category = () => {
   const [update_modal, set_update_modal] = useState(false);
   const [selected_category, set_selected_category] = useState(null);
 
-  const {
-    data: categoryData,
-    isLoading,
-    error,
-  } = useCategoriesAdmin({
+  const { data: categoryData, isLoading } = useCategoriesAdmin({
     page,
     limit,
     search_term,
   });
+
+  console.log(
+    "categoryData?.data?.meta?.total",
+    categoryData?.data?.meta?.total,
+  );
   const serial = useSerial(page, limit);
 
   const handleUpdate = (item: any) => {
@@ -64,6 +66,13 @@ const Category = () => {
         handleUpdate={handleUpdate}
       />
 
+      <Pagination
+        page={page}
+        limit={limit}
+        total={categoryData?.data?.meta?.total}
+        setPage={set_page}
+        setLimit={set_limit}
+      />
       <CategoryCreate open={create_modal} onOpenChange={set_create_modal} />
 
       <CategoryUpdate

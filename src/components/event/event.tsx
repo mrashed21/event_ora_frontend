@@ -1,5 +1,6 @@
 "use client";
 import { useGetMe } from "@/api/auth/auth.api";
+import { useCategories } from "@/api/category/category.api";
 import { useEventsUser } from "@/api/event/event.api";
 import useSerial from "@/hooks/serial-number";
 import { useState } from "react";
@@ -25,6 +26,9 @@ const Event = () => {
     limit,
     search_term,
   });
+
+  const { data: categoryData, refetch: categoryRefetch } = useCategories();
+  console.log("categoryData: ", categoryData);
 
   const serial = useSerial(page, limit);
 
@@ -75,13 +79,15 @@ const Event = () => {
       <EventCreate
         open={create_modal}
         onOpenChange={set_create_modal}
-        userData={userData}
+        userData={userData?.data}
+        categoryData={categoryData?.data}
       />
 
       <EventUpdate
         open={update_modal}
         onOpenChange={set_update_modal}
         eventData={selected_event}
+        categoryData={categoryData?.data}
       />
     </section>
   );
