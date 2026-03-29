@@ -15,7 +15,8 @@ export interface EventInterface {
   event_description: string;
   event_status: "active" | "in_active";
   event_type: "public" | "private";
-  is_paid: boolean;
+  is_paid?: boolean;
+  is_featured?: boolean;
   user:
     | {
         id: string;

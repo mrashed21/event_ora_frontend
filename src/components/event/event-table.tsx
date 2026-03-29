@@ -61,7 +61,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+    <div className="overflow-scroll rounded-xl border bg-white shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
@@ -75,7 +75,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
             <TableHead>Fee</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
-            <TableHead>Created By</TableHead>
+            <TableHead>Organizer</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>

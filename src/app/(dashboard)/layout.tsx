@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <main>
+    <main className="overflow-hidden">
       <SidebarProvider>
         <AppSidebar role={role} />
 
