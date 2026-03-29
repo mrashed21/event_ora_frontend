@@ -1,9 +1,11 @@
 import Hero from "@/components/frontend/home/hero/hero";
+import UpComing from "@/components/frontend/home/up-coming/up-coming";
 
 const HomePage = () => {
   return (
-    <section className="flex items-center justify-center  gap-5">
+    <section className="">
       <Hero />
+      <UpComing />
     </section>
   );
 };

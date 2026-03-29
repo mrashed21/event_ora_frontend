@@ -80,11 +80,25 @@ const getFeaturedEventApi = async () => {
   return data;
 };
 
-//! GET Event by id hook
+//! GET featured Event hook
 export const useFeaturedEvent = () => {
   return useQuery({
     queryKey: ["featured-event"],
     queryFn: () => getFeaturedEventApi(),
+  });
+};
+
+// !get up-coming Event
+const getUpComingEventApi = async () => {
+  const { data } = await api.get(`/event/upcoming`);
+  return data;
+};
+
+//! GET up-coming Event hook
+export const useUpComingEvent = () => {
+  return useQuery({
+    queryKey: ["up-coming-event"],
+    queryFn: () => getUpComingEventApi(),
   });
 };
 

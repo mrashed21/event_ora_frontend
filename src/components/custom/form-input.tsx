@@ -29,7 +29,7 @@ const FormInput = ({
       <label className="text-sm font-medium">{label}</label>
 
       <Input
-        type="text"
+        type={type}
         placeholder={placeholder}
         readOnly={readonly}
         inputMode={isNumber ? "numeric" : undefined}

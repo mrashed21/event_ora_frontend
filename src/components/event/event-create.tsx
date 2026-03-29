@@ -279,7 +279,7 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
             <FormInput
               label="Registration Fee"
               name="registration_fee"
-              type="number"
+              type="text"
               placeholder="Enter registration fee"
               register={register}
               error={errors.registration_fee}
