@@ -17,6 +17,15 @@ export interface CategoryInterface {
   updated_at: string;
 }
 
+export interface HomeCategoryQueryParams {
+  category_status?: string;
+  category_type?: "public" | "private";
+  is_paid?: boolean;
+  page?: number;
+  limit?: number;
+  search_term?: string;
+}
+
 //* GET public categories
 const getCategoriesApi = async () => {
   const { data } = await api.get("/category");
@@ -28,6 +37,51 @@ export const useCategories = () => {
   return useQuery({
     queryKey: ["categories-public"],
     queryFn: getCategoriesApi,
+  });
+};
+
+//* GET home categories
+const getHomeCategoriesApi = async (params?: HomeCategoryQueryParams) => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.category_status) {
+    searchParams.append("category_status", params.category_status);
+  }
+
+  if (params?.category_type) {
+    searchParams.append("category_type", params.category_type);
+  }
+
+  if (params?.is_paid !== undefined) {
+    searchParams.append("is_paid", String(params.is_paid));
+  }
+
+  if (params?.page) {
+    searchParams.append("page", String(params.page));
+  }
+
+  if (params?.limit) {
+    searchParams.append("limit", String(params.limit));
+  }
+
+  if (params?.search_term) {
+    searchParams.append("search_term", params.search_term);
+  }
+
+  const queryString = searchParams.toString();
+
+  const { data } = await api.get(
+    `/category/home${queryString ? `?${queryString}` : ""}`,
+  );
+
+  return data;
+};
+
+//* GET home categories hook
+export const useHomeCategories = (params?: HomeCategoryQueryParams) => {
+  return useQuery({
+    queryKey: ["categories-home", params],
+    queryFn: () => getHomeCategoriesApi(params),
   });
 };
 
