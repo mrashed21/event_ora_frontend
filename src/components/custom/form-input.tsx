@@ -11,6 +11,7 @@ type FormInputProps = {
   register: UseFormRegister<any>;
   error?: FieldError;
   readonly?: boolean;
+  isNumber?: boolean;
 };
 
 const FormInput = ({
@@ -21,16 +22,28 @@ const FormInput = ({
   register,
   error,
   readonly = false,
+  isNumber = false,
 }: FormInputProps) => {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">{label}</label>
 
       <Input
-        type={type}
+        type="text"
         placeholder={placeholder}
-        {...register(name)}
         readOnly={readonly}
+        inputMode={isNumber ? "numeric" : undefined}
+        {...register(name, {
+          setValueAs: (value) => {
+            if (!isNumber) return value;
+            return value === "" ? undefined : Number(value);
+          },
+        })}
+        onInput={(e) => {
+          if (!isNumber) return;
+          const target = e.target as HTMLInputElement;
+          target.value = target.value.replace(/[^0-9]/g, "");
+        }}
       />
 
       {error && <p className="text-sm text-red-500">{error.message}</p>}

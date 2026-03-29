@@ -1,14 +1,12 @@
 "use client";
 
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
 import { useGetMe } from "@/api/auth/auth.api";
 import AppBreadcrumb from "@/components/dasboard/app-breadcrumb";
 import AppSidebar from "@/components/dasboard/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading } = useGetMe();
-
   const role = data?.data?.user_role;
 
   if (isLoading || !role) {
@@ -20,21 +18,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <main className="overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
       <SidebarProvider>
         <AppSidebar role={role} />
 
-        <SidebarInset>
+        <SidebarInset className="flex flex-col min-w-0 flex-1">
           {/* Top Bar */}
-          <header className="flex h-14 items-center border-b px-4">
+          <header className="flex h-14 shrink-0 items-center border-b px-4">
             <AppBreadcrumb />
           </header>
 
-          {/* Page Content */}
-          <main className="p-6">{children}</main>
+          {/* Page Content - only this scrolls */}
+          <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </SidebarInset>
       </SidebarProvider>
-    </main>
+    </div>
   );
 };
 

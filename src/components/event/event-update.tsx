@@ -311,6 +311,7 @@ const EventUpdate = ({ open, onOpenChange, eventData }: Props) => {
               placeholder="Enter registration fee"
               register={register}
               error={errors.registration_fee}
+              isNumber={true}
             />
           )}
 

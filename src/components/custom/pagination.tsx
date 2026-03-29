@@ -17,7 +17,6 @@ const Pagination = ({
   setLimit,
   limitOptions = [10, 20, 50, 100],
 }: PaginationProps) => {
-  console.log("page: ", page, "limit : ", limit, "total: ", total);
   const totalPage = Math.ceil(total / limit);
 
   if (totalPage <= 1) return null;

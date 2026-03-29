@@ -119,7 +119,7 @@ const AllEventTable = ({ data, isLoading, serial }: Props) => {
   };
 
   return (
-    <section className="relative w-full overflow-hidden rounded-lg border shadow-md">
+    <section className="relative w-full  rounded-lg border shadow-md">
       <div className="overflow-x-auto">
         <Table className="min-w-full">
           <TableHeader>

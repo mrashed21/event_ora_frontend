@@ -283,6 +283,7 @@ const EventCreate = ({ open, onOpenChange, userData }: Props) => {
               placeholder="Enter registration fee"
               register={register}
               error={errors.registration_fee}
+              isNumber={true}
             />
           )}
 

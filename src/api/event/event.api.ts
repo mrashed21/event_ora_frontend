@@ -74,6 +74,20 @@ export const useEventById = (id: string) => {
   });
 };
 
+// !get featured Event
+const getFeaturedEventApi = async () => {
+  const { data } = await api.get(`/event/featured`);
+  return data;
+};
+
+//! GET Event by id hook
+export const useFeaturedEvent = () => {
+  return useQuery({
+    queryKey: ["featured-event"],
+    queryFn: () => getFeaturedEventApi(),
+  });
+};
+
 //* GET Event (pagination + search_term) user
 const getEventsUserApi = async ({
   page = 1,
@@ -90,7 +104,7 @@ const getEventsUserApi = async ({
   return data;
 };
 
-//! GET Events hook
+//! GET Events hook user
 export const useEventsUser = ({
   page = 1,
   limit = 10,
@@ -119,7 +133,7 @@ const getEventsAdminApi = async ({
   return data;
 };
 
-//! GET Events hook
+//! GET Events hook admin
 export const useEventsAdmin = ({
   page = 1,
   limit = 10,

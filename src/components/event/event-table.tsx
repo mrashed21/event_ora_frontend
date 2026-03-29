@@ -61,7 +61,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   };
 
   return (
-    <div className="overflow-scroll rounded-xl border bg-white shadow-sm">
+    <div className=" rounded-xl border bg-white shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
