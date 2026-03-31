@@ -6,6 +6,13 @@ import {
 } from "@/api/category/category.api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
@@ -15,6 +22,15 @@ type FilterKey =
   | "private-free"
   | "private-paid";
 
+type CategoryItem = {
+  id: string;
+  category_title: string;
+  category_description: string;
+  category_image: string;
+  category_type: "public" | "private";
+  is_paid: boolean;
+};
+
 const filterOptions: { key: FilterKey; label: string }[] = [
   { key: "public-free", label: "Public Free" },
   { key: "public-paid", label: "Public Paid" },
@@ -23,58 +39,52 @@ const filterOptions: { key: FilterKey; label: string }[] = [
 ];
 
 const Category = () => {
-  const [activeFilter, setActiveFilter] = useState<FilterKey>("public-free");
+  const [activeFilter, setActiveFilter] = useState<FilterKey | null>(null);
 
   const queryParams = useMemo<HomeCategoryQueryParams>(() => {
+    const baseParams: HomeCategoryQueryParams = {
+      category_status: "active",
+      page: 1,
+      limit: 20,
+    };
+
     switch (activeFilter) {
       case "public-free":
         return {
-          category_status: "active",
+          ...baseParams,
           category_type: "public",
           is_paid: false,
-          page: 1,
-          limit: 10,
         };
 
       case "public-paid":
         return {
-          category_status: "active",
+          ...baseParams,
           category_type: "public",
           is_paid: true,
-          page: 1,
-          limit: 10,
         };
 
       case "private-free":
         return {
-          category_status: "active",
+          ...baseParams,
           category_type: "private",
           is_paid: false,
-          page: 1,
-          limit: 10,
         };
 
       case "private-paid":
         return {
-          category_status: "active",
+          ...baseParams,
           category_type: "private",
           is_paid: true,
-          page: 1,
-          limit: 10,
         };
 
       default:
-        return {
-          category_status: "active",
-          page: 1,
-          limit: 10,
-        };
+        return baseParams;
     }
   }, [activeFilter]);
 
   const { data: categoryData, isLoading } = useHomeCategories(queryParams);
 
-  const categories = categoryData?.data?.data || [];
+  const categories: CategoryItem[] = categoryData?.data?.data || [];
 
   return (
     <section className="py-16 md:py-24">
@@ -95,6 +105,15 @@ const Category = () => {
 
         {/* Filters */}
         <div className="mb-10 flex flex-wrap items-center justify-center gap-3">
+          <Button
+            type="button"
+            variant={activeFilter === null ? "default" : "outline"}
+            onClick={() => setActiveFilter(null)}
+            className="rounded-full px-5"
+          >
+            All
+          </Button>
+
           {filterOptions.map((filter) => {
             const isActive = activeFilter === filter.key;
 
@@ -139,46 +158,61 @@ const Category = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((category: any) => (
-              <Card
-                key={category.id}
-                className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-              >
-                <div className="relative h-52 w-full overflow-hidden">
-                  <Image
-                    src={category.category_image}
-                    alt={category.category_title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+          <div className="relative">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: categories.length > 4,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-4">
+                {categories.map((category) => (
+                  <CarouselItem
+                    key={category.id}
+                    className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  >
+                    <Card className="group h-full overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                      <div className="relative h-52 w-full overflow-hidden">
+                        <Image
+                          src={category.category_image}
+                          alt={category.category_title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
 
-                  <div className="absolute left-4 top-4 flex gap-2">
-                    <span className="rounded-full border bg-background/90 px-3 py-1 text-xs font-medium capitalize text-foreground backdrop-blur">
-                      {category.category_type}
-                    </span>
+                        <div className="absolute left-4 top-4 flex gap-2">
+                          <span className="rounded-full border bg-background/90 px-3 py-1 text-xs font-medium capitalize text-foreground backdrop-blur">
+                            {category.category_type}
+                          </span>
 
-                    <span className="rounded-full border bg-background/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
-                      {category.is_paid ? "Paid" : "Free"}
-                    </span>
-                  </div>
-                </div>
+                          <span className="rounded-full border bg-background/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
+                            {category.is_paid ? "Paid" : "Free"}
+                          </span>
+                        </div>
+                      </div>
 
-                <CardContent className="p-5">
-                  <h3 className="line-clamp-1 text-xl font-semibold text-foreground">
-                    {category.category_title}
-                  </h3>
+                      <CardContent className="flex h-55 flex-col p-5">
+                        <h3 className="line-clamp-1 text-xl font-semibold text-foreground">
+                          {category.category_title}
+                        </h3>
 
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                    {category.category_description}
-                  </p>
+                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                          {category.category_description}
+                        </p>
 
-                  <Button variant="link" className="mt-4 h-auto px-0">
-                    Explore Category →
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                        <Button variant="link" className="mt-auto h-auto px-0">
+                          Explore Category →
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+
+              <CarouselPrevious className="-left-4 hidden md:flex" />
+              <CarouselNext className="-right-4 hidden md:flex" />
+            </Carousel>
           </div>
         )}
       </div>

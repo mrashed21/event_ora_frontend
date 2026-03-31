@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useEvents } from "@/api/event/event.api";
 
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import EventCard from "./event-card";
-import { EventItem, EventsResponse, FilterType } from "./event.interface";
+import { EventsResponse, FilterType } from "./event.interface";
 
 const FILTERS: { label: string; value: FilterType }[] = [
   { label: "All", value: "all" },
@@ -21,21 +21,23 @@ const FILTERS: { label: string; value: FilterType }[] = [
   { label: "Private Paid", value: "private_paid" },
 ];
 
-const matchesFilter = (event: EventItem, filter: FilterType) => {
-  const categoryType = event.category?.category_type;
-  const isPaid = event.category?.is_paid;
+const getFilterQuery = (filter: FilterType) => {
+  switch (filter) {
+    case "public_free":
+      return { category_type: "public" as const, is_paid: false };
 
-  if (filter === "all") return true;
-  if (filter === "public_free")
-    return categoryType === "public" && isPaid === false;
-  if (filter === "public_paid")
-    return categoryType === "public" && isPaid === true;
-  if (filter === "private_free")
-    return categoryType === "private" && isPaid === false;
-  if (filter === "private_paid")
-    return categoryType === "private" && isPaid === true;
+    case "public_paid":
+      return { category_type: "public" as const, is_paid: true };
 
-  return true;
+    case "private_free":
+      return { category_type: "private" as const, is_paid: false };
+
+    case "private_paid":
+      return { category_type: "private" as const, is_paid: true };
+
+    default:
+      return {};
+  }
 };
 
 const Event = () => {
@@ -44,20 +46,19 @@ const Event = () => {
   const [search_term, setSearchTerm] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 
+  const filterQuery = getFilterQuery(activeFilter);
+
   const { data: eventData, isLoading } = useEvents({
     page,
     limit,
     search_term,
+    ...filterQuery,
   }) as {
     data: EventsResponse | undefined;
     isLoading: boolean;
   };
 
-  const apiEvents = eventData?.data?.data ?? [];
-
-  const filteredEvents = useMemo(() => {
-    return apiEvents.filter((event) => matchesFilter(event, activeFilter));
-  }, [apiEvents, activeFilter]);
+  const events = eventData?.data?.data ?? [];
 
   return (
     <section className="bg-linear-to-b from-background to-muted/20 py-10 md:py-14">
@@ -74,14 +75,14 @@ const Event = () => {
             </h1>
 
             <p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-              Search events by title or organizer and filter by public/private
+              Search events by title or category and filter by public/private
               and free/paid categories.
             </p>
           </div>
 
           <div className="w-full md:max-w-sm">
             <SearchField
-              placeholder="Search by title or organizer..."
+              placeholder="Search by title or category..."
               onSearch={(value) => {
                 setPage(1);
                 setSearchTerm(value);
@@ -118,9 +119,8 @@ const Event = () => {
               <EventCardSkeleton key={index} />
             ))}
           </div>
-        ) : filteredEvents.length === 0 ? (
-          /* Empty */
-          <div className="flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-dashed bg-background px-6 text-center">
+        ) : events.length === 0 ? (
+          <div className="flex min-h-75 flex-col items-center justify-center rounded-3xl border border-dashed bg-background px-6 text-center">
             <h3 className="text-xl font-semibold">No events found</h3>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
               Try changing the search term or selecting a different filter.
@@ -130,12 +130,12 @@ const Event = () => {
           <>
             {/* Cards */}
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredEvents.map((event) => (
+              {events.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
 
-            {/* pagination  */}
+            {/* Pagination */}
             <Pagination
               page={page}
               limit={limit}

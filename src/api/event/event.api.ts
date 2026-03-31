@@ -21,7 +21,7 @@ export interface EventInterface {
   userId: string | null;
   created_at: string;
   updated_at: string;
-  joined_participants?:any[];
+  joined_participants?: any[];
 
   user?: {
     id: string;
@@ -70,31 +70,84 @@ export interface EventInterface {
   };
 }
 
+export type GetEventsParams = {
+  page?: number;
+  limit?: number;
+  search_term?: string;
+  category_type?: "public" | "private";
+  is_paid?: boolean;
+  event_status?: string;
+  is_featured?: boolean;
+};
+
 //* GET Events (pagination + search_term)
+//* GET Events (pagination + search + filter)
 const getEventsApi = async ({
   page = 1,
   limit = 10,
   search_term,
-}: GetPaginationParams) => {
+  category_type,
+  is_paid,
+  event_status,
+  is_featured,
+}: GetEventsParams) => {
   const params: any = { page, limit };
 
   if (search_term?.trim()) {
     params.search_term = search_term;
   }
 
+  if (category_type) {
+    params.category_type = category_type;
+  }
+
+  if (typeof is_paid === "boolean") {
+    params.is_paid = is_paid;
+  }
+
+  if (event_status) {
+    params.event_status = event_status;
+  }
+
+  if (typeof is_featured === "boolean") {
+    params.is_featured = is_featured;
+  }
+
   const { data } = await api.get("/event", { params });
   return data;
 };
-
+//! GET Events hook
 //! GET Events hook
 export const useEvents = ({
   page = 1,
   limit = 10,
   search_term,
-}: GetPaginationParams) => {
+  category_type,
+  is_paid,
+  event_status,
+  is_featured,
+}: GetEventsParams) => {
   return useQuery({
-    queryKey: ["events", page, limit, search_term],
-    queryFn: () => getEventsApi({ page, limit, search_term }),
+    queryKey: [
+      "events",
+      page,
+      limit,
+      search_term,
+      category_type,
+      is_paid,
+      event_status,
+      is_featured,
+    ],
+    queryFn: () =>
+      getEventsApi({
+        page,
+        limit,
+        search_term,
+        category_type,
+        is_paid,
+        event_status,
+        is_featured,
+      }),
   });
 };
 
