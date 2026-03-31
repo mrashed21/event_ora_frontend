@@ -87,12 +87,18 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["user"],
   },
   {
+    title: "Pending Request",
+    icon: ListChecksIcon,
+    path: "/user/pending-request",
+    roles: ["user"],
+  },
+  {
     title: "Join Request",
     icon: ListChecksIcon,
     path: "/user/join-request",
     roles: ["user"],
   },
-   {
+  {
     title: "All Event",
     icon: ListChecks,
     path: "/admin/all-event",

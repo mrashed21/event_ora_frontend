@@ -1,5 +1,5 @@
 import { GetPaginationParams } from "@/interface/meta-interface";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api";
 
 //! TYPES
@@ -119,5 +119,40 @@ export const usePendingParticipants = (
   return useQuery({
     queryKey: ["participants-pending", params],
     queryFn: () => getPendingParticipantsApi(params),
+  });
+};
+
+type UpdateReqPayload = {
+  id: string;
+  participant_id: string;
+  replay_note: string;
+  status: "approved" | "rejected";
+};
+
+// todo UPDATE request
+const updateEventApi = async ({
+  id,
+  participant_id,
+  replay_note,
+  status,
+}: UpdateReqPayload) => {
+  const { data } = await api.patch(`/participant/pending/${id}`, {
+    participant_id,
+    replay_note,
+    status,
+  });
+
+  return data;
+};
+
+//! UPDATE request hook
+export const useUpdateRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateEventApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participants-pending"] });
+    },
   });
 };

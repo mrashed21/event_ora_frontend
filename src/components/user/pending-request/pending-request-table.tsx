@@ -1,5 +1,6 @@
 "use client";
 
+import UpdateRequestModal from "@/components/custom/update-request";
 import TableSkeleton from "@/components/skeleton/table-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
 import { formatDate, formatTime } from "@/hooks/date-format";
 import { CircleCheckBig, XCircle } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface PendingRequestTableProps {
   data: any[];
@@ -26,6 +28,11 @@ const PendingRequestTable = ({
   isLoading,
   serial,
 }: PendingRequestTableProps) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [actionType, setActionType] = useState<"approved" | "rejected">(
+    "approved",
+  );
+  const [selected, setSelected] = useState<any>(null);
   if (isLoading) {
     return <TableSkeleton />;
   }
@@ -124,25 +131,45 @@ const PendingRequestTable = ({
                 <TableCell>{formatDate(item?.requested_at)}</TableCell>
 
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button size="sm" variant={"outline"}>
-                      <CircleCheckBig size={18} />
-                    </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelected(item);
+                      setActionType("approved");
+                      setModalOpen(true);
+                    }}
+                  >
+                    <CircleCheckBig size={18} />
+                  </Button>
 
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="rounded-lg"
-                    >
-                      <XCircle size={18} />
-                    </Button>
-                  </div>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => {
+                      setSelected(item);
+                      setActionType("rejected");
+                      setModalOpen(true);
+                    }}
+                  >
+                    <XCircle size={18} />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      {selected && (
+        <UpdateRequestModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          participantId={selected.participant_id}
+          eventId={selected.event_id}
+          type={actionType}
+        />
+      )}
     </div>
   );
 };
