@@ -13,10 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDate, formatTime } from "@/hooks/date-format";
-import { Loader2, PanelTopDashed, Pencil, Trash2 } from "lucide-react";
+import { Box, Loader2, PanelTopDashed, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import DescriptionModal from "../custom/description-modal";
+import ParticipantsModal from "../custom/participants-modal";
 
 interface Props {
   data: EventInterface[];
@@ -31,6 +32,10 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [selectedDescription, setSelectedDescription] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [participant_modal, set_participant_modal] = useState(false);
+  const [selected_event, set_selected_event] = useState<EventInterface | null>(
+    null,
+  );
 
   if (isLoading) {
     return <TableSkeleton />;
@@ -59,6 +64,10 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
       setDeletingId(null);
     }
   };
+  const handleParticipantsClick = (event: EventInterface) => {
+    set_selected_event(event);
+    set_participant_modal(true);
+  };
 
   return (
     <div className="rounded-xl border bg-white shadow-sm overflow-x-auto">
@@ -75,6 +84,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
             <TableHead>Fee</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
+            <TableHead>Participants</TableHead>
             <TableHead>Organizer</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -157,7 +167,7 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
                     {isPaid ? (
                       <div>
                         <span className="font-medium">
-                          ৳ {event.registration_fee ?? 0}
+                          $ {event.registration_fee ?? 0}
                         </span>
                         <div className="text-xs text-muted-foreground">
                           Paid
@@ -184,6 +194,17 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
 
                   {/* Joined */}
                   <TableCell>{event.total_joined ?? 0}</TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => handleParticipantsClick(event)}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Box className="h-4 w-4" />
+                      {event?.joined_participants?.length || 0}
+                    </Button>
+                  </TableCell>
 
                   {/* Organizer */}
                   <TableCell>
@@ -244,6 +265,13 @@ const EventTable = ({ data, isLoading, serial, handleUpdate }: Props) => {
         open={descriptionModalOpen}
         onOpenChange={setDescriptionModalOpen}
         description={selectedDescription}
+      />
+
+      <ParticipantsModal
+        open={participant_modal}
+        onOpenChange={set_participant_modal}
+        participants={selected_event?.joined_participants || []}
+        eventTitle={selected_event?.event_title}
       />
     </div>
   );

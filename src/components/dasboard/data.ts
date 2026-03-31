@@ -2,6 +2,7 @@ import {
   CalendarPlus,
   LayoutDashboard,
   ListChecks,
+  ListChecksIcon,
   Package,
   Settings,
   Shield,
@@ -83,6 +84,12 @@ export const sidebarItems: SidebarItem[] = [
     title: "Event",
     icon: CalendarPlus,
     path: "/user/event",
+    roles: ["user"],
+  },
+  {
+    title: "Join Request",
+    icon: ListChecksIcon,
+    path: "/user/join-request",
     roles: ["user"],
   },
    {

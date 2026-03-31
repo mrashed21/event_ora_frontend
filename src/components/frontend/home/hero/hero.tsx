@@ -134,7 +134,7 @@ const Hero = () => {
                           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-md">
                             <Ticket className="h-4 w-4 text-primary" />
                             {isPaid
-                              ? `৳ ${event.registration_fee || 0}`
+                              ? `$ ${event.registration_fee || 0}`
                               : "Free Entry"}
                           </div>
                         </div>

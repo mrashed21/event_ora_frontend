@@ -23,7 +23,7 @@ const formatDate = (dateString: string) => {
 
 const formatFee = (fee?: number, isPaid?: boolean) => {
   if (!isPaid) return "Free";
-  return `৳${fee ?? 0}`;
+  return `$${fee ?? 0}`;
 };
 
 const getEventTypeBadge = (category?: EventCategory) => {

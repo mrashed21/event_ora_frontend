@@ -25,10 +25,7 @@ const Category = () => {
     search_term,
   });
 
-  console.log(
-    "categoryData?.data?.meta?.total",
-    categoryData?.data?.meta?.total,
-  );
+  
   const serial = useSerial(page, limit);
 
   const handleUpdate = (item: any) => {

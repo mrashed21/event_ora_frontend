@@ -28,7 +28,6 @@ const Event = () => {
   });
 
   const { data: categoryData, refetch: categoryRefetch } = useCategories();
-  console.log("categoryData: ", categoryData);
 
   const serial = useSerial(page, limit);
 

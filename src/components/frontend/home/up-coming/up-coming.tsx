@@ -152,7 +152,7 @@ const UpComing = () => {
                   {/* Top badges */}
                   <div className="absolute left-4 top-4 flex flex-wrap gap-2">
                     <Badge className="rounded-full border border-white/20 bg-black/50 px-3 py-1 text-white backdrop-blur-md hover:bg-black/50">
-                      {isPaid ? `৳ ${event.registration_fee || 0}` : "Free"}
+                      {isPaid ? `$ ${event.registration_fee || 0}` : "Free"}
                     </Badge>
 
                     {event.is_featured && (

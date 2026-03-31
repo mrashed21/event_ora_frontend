@@ -27,13 +27,13 @@ const Navbar = () => {
   const { mutateAsync: logout } = useLogout();
   const user = data?.data;
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <p>Loading...</p>
+  //     </div>
+  //   );
+  // }
 
   const handleRidirect = () => {
     if (user?.user_role === "admin" || user?.user_role === "super_admin") {

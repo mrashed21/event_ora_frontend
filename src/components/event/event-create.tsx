@@ -48,8 +48,7 @@ const EventCreate = ({
 }: Props) => {
   const { mutateAsync: createEvent } = useCreateEvent();
   const [file, setFile] = useState<File | null>(null);
-  console.log(userData);
-
+  
   const options = categoryData.map((category) => ({
     id: category.id,
     label: category.is_paid

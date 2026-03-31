@@ -219,7 +219,7 @@ const AllEventTable = ({ data, isLoading, serial }: Props) => {
                       {isPaid ? (
                         <div>
                           <span className="font-medium">
-                            ৳ {event.registration_fee ?? 0}
+                            $ {event.registration_fee ?? 0}
                           </span>
                           <div className="text-xs text-muted-foreground">
                             Paid
