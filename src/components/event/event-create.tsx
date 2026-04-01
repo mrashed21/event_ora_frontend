@@ -40,15 +40,10 @@ type Props = {
   userData?: any;
 };
 
-const EventCreate = ({
-  open,
-  onOpenChange,
-  categoryData = [],
-  userData,
-}: Props) => {
+const EventCreate = ({ open, onOpenChange, categoryData = [] }: Props) => {
   const { mutateAsync: createEvent } = useCreateEvent();
   const [file, setFile] = useState<File | null>(null);
-  
+
   const options = categoryData.map((category) => ({
     id: category.id,
     label: category.is_paid

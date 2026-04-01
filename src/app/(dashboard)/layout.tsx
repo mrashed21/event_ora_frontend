@@ -9,13 +9,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading } = useGetMe();
   const role = data?.data?.user_role;
 
-  if (isLoading || !role) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  // if (isLoading || !role) {
+  //   return (
+  //     <div className="flex items-center justify-center h-screen">
+  //       <p>Loading...</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex h-screen overflow-hidden">

@@ -1,12 +1,15 @@
 import {
+  CalendarCheck,
+  CalendarDays,
   CalendarPlus,
+  FolderKanban,
   LayoutDashboard,
-  ListChecks,
-  ListChecksIcon,
-  Package,
-  Settings,
-  Shield,
+  ListTodo,
+  MailPlus,
+  Package2,
+  ShieldCheck,
   User,
+  UserCog,
   Users,
 } from "lucide-react";
 
@@ -21,6 +24,7 @@ export interface SidebarItem {
 }
 
 export const sidebarItems: SidebarItem[] = [
+  //! ADMIN / SUPER ADMIN
   {
     title: "Dashboard",
     icon: LayoutDashboard,
@@ -28,47 +32,31 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["admin", "super_admin"],
   },
   {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/user/dashboard",
-    roles: ["user"],
-  },
-  {
-    title: "Users",
+    title: "All Users",
     icon: Users,
+    path: "/admin/users",
     roles: ["admin", "super_admin"],
-    children: [
-      {
-        title: "All Users",
-        path: "/dashboard/users",
-        roles: ["admin", "super_admin"],
-      },
-      {
-        title: "Add User",
-        path: "/dashboard/users/create",
-        roles: ["super_admin"],
-      },
-    ],
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    path: "/admin/category",
-    roles: ["user", "admin", "super_admin"],
   },
   {
     title: "Category",
-    icon: Package,
+    icon: FolderKanban,
     path: "/admin/category",
+    roles: ["admin", "super_admin"],
+  },
+  {
+    title: "All Event",
+    icon: CalendarDays,
+    path: "/admin/all-event",
     roles: ["admin", "super_admin"],
   },
   {
     title: "Admin",
-    icon: Shield,
+    icon: ShieldCheck,
     roles: ["super_admin"],
     children: [
       {
         title: "Manage Admin",
+        icon: UserCog,
         path: "/admin/all-admin",
         roles: ["super_admin"],
       },
@@ -77,8 +65,16 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Profile",
     icon: User,
-    path: "/dashboard/profile",
-    roles: ["user", "admin", "super_admin"],
+    path: "/admin/profile",
+    roles: ["admin", "super_admin"],
+  },
+
+  //! USER
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/user/dashboard",
+    roles: ["user"],
   },
   {
     title: "Event",
@@ -88,32 +84,32 @@ export const sidebarItems: SidebarItem[] = [
   },
   {
     title: "Pending Request",
-    icon: ListChecksIcon,
+    icon: ListTodo,
     path: "/user/pending-request",
     roles: ["user"],
   },
   {
     title: "Joined Events",
-    icon: ListChecksIcon,
+    icon: CalendarCheck,
     path: "/user/join-event",
     roles: ["user"],
   },
   {
-    title: "Invaitation Request",
-    icon: ListChecksIcon,
+    title: "Invitation Request",
+    icon: Package2,
     path: "/user/invitation-request",
     roles: ["user"],
   },
   {
-    title: "Send Invaitation",
-    icon: ListChecksIcon,
+    title: "Send Invitation",
+    icon: MailPlus,
     path: "/user/send-invitation",
     roles: ["user"],
   },
   {
-    title: "All Event",
-    icon: ListChecks,
-    path: "/admin/all-event",
-    roles: ["admin", "super_admin"],
+    title: "Profile",
+    icon: User,
+    path: "/user/profile",
+    roles: ["user"],
   },
 ];

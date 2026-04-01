@@ -67,7 +67,7 @@ const JoinRequestTable = ({
             </TableRow>
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="capitalize">
             {data?.length > 0 ? (
               data.map((item) => (
                 <TableRow key={item.id}>
@@ -155,7 +155,7 @@ const JoinRequestTable = ({
                   <TableCell>
                     <div className="space-y-1">
                       <Badge variant={getPaymentVariant(item.payment_status)}>
-                        {item.payment_status || "Unknown"}
+                        {item.payment_status?.replace("_", " ") || "Unknown"}
                       </Badge>
 
                       {item?.payment?.amount ? (

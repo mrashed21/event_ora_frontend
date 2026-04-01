@@ -34,6 +34,9 @@ const AppSidebar = ({ role }: { role: string }) => {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        <div className="text-center py-4 px-2">
+          <h1 className="text-lg font-bold">EventOra</h1>
+        </div>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
