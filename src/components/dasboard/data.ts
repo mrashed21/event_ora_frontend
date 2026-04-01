@@ -24,17 +24,13 @@ export interface SidebarItem {
 }
 
 export const sidebarItems: SidebarItem[] = [
+  //! =========================
   //! ADMIN / SUPER ADMIN
+  //! =========================
   {
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/admin/dashboard",
-    roles: ["admin", "super_admin"],
-  },
-  {
-    title: "All Users",
-    icon: Users,
-    path: "/admin/users",
     roles: ["admin", "super_admin"],
   },
   {
@@ -44,21 +40,27 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["admin", "super_admin"],
   },
   {
-    title: "All Event",
+    title: "All Events",
     icon: CalendarDays,
     path: "/admin/all-event",
     roles: ["admin", "super_admin"],
   },
   {
-    title: "Admin",
+    title: "User Management",
     icon: ShieldCheck,
     roles: ["super_admin"],
     children: [
       {
-        title: "Manage Admin",
+        title: "Admins",
         icon: UserCog,
         path: "/admin/all-admin",
         roles: ["super_admin"],
+      },
+      {
+        title: "Users",
+        icon: Users,
+        path: "/admin/users",
+        roles: ["admin", "super_admin"],
       },
     ],
   },
@@ -69,47 +71,86 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["admin", "super_admin"],
   },
 
-  //! USER
+  //! =========================
+  //! USER (Grouped, same routes)
+  //! =========================
+
   {
     title: "Dashboard",
     icon: LayoutDashboard,
     path: "/user/dashboard",
     roles: ["user"],
   },
+
+  // 🔹 Event Management (own events)
   {
-    title: "Event",
-    icon: CalendarPlus,
-    path: "/user/event",
+    title: "My Events",
+    icon: CalendarDays,
     roles: ["user"],
+    children: [
+      {
+        title: "Create Event",
+        icon: CalendarPlus,
+        path: "/user/event",
+        roles: ["user"],
+      },
+      {
+        title: "Pending Requests",
+        icon: ListTodo,
+        path: "/user/pending-request",
+        roles: ["user"],
+      },
+    ],
   },
+
+  // 🔹 Participation
   {
-    title: "Pending Request",
-    icon: ListTodo,
-    path: "/user/pending-request",
-    roles: ["user"],
-  },
-  {
-    title: "Joined Events",
+    title: "Participation",
     icon: CalendarCheck,
-    path: "/user/join-event",
     roles: ["user"],
+    children: [
+      {
+        title: "Joined Events",
+        icon: CalendarCheck,
+        path: "/user/join-event",
+        roles: ["user"],
+      },
+    ],
   },
+
+  // 🔹 Invitations
   {
-    title: "Invitation Request",
-    icon: Package2,
-    path: "/user/invitation-request",
-    roles: ["user"],
-  },
-  {
-    title: "Send Invitation",
+    title: "Invitations",
     icon: MailPlus,
-    path: "/user/send-invitation",
     roles: ["user"],
+    children: [
+      {
+        title: "Received Invitations",
+        icon: Package2,
+        path: "/user/invitation-request",
+        roles: ["user"],
+      },
+      {
+        title: "Send Invitations",
+        icon: MailPlus,
+        path: "/user/send-invitation",
+        roles: ["user"],
+      },
+    ],
   },
+
+  // 🔹 Account
   {
-    title: "Profile",
+    title: "Account",
     icon: User,
-    path: "/user/profile",
     roles: ["user"],
+    children: [
+      {
+        title: "Profile",
+        icon: User,
+        path: "/user/profile",
+        roles: ["user"],
+      },
+    ],
   },
 ];
