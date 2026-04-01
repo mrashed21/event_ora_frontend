@@ -1,7 +1,16 @@
-type Props = {};
+import PaymentSuccessPage from "@/components/payment-success/payment-success";
 
-const Page = ({}: Props) => {
-  return <section>Muhammad Rashed! Welcome to Page Components</section>;
+export const metadata = {
+  title: "Payment Success",
+  description: "This is the payment success page.",
+};
+
+const Page = () => {
+  return (
+    <section>
+      <PaymentSuccessPage />
+    </section>
+  );
 };
 
 export default Page;

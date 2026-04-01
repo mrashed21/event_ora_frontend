@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate } from "@/hooks/date-format";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type Props = {
@@ -37,7 +38,7 @@ const getStatusVariant = (status: string) => {
 
 const MyInvitationTable = ({ data, isLoading }: Props) => {
   const { mutateAsync, isPending } = useUpdateInvitationStatus();
-
+  const router = useRouter();
   if (isLoading) {
     return <TableSkeleton />;
   }
@@ -45,6 +46,10 @@ const MyInvitationTable = ({ data, isLoading }: Props) => {
   const handleAction = async (id: string, action: "ACCEPT" | "REJECT") => {
     try {
       const res = await mutateAsync({ id, action });
+      console.log("Response from API:", res);
+      if (res?.success && res?.data?.checkoutUrl) {
+        router.push(res.data.checkoutUrl);
+      }
       toast.success(res?.message || `Invitation ${action.toLowerCase()}ed`);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Something went wrong");

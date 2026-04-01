@@ -14,9 +14,7 @@ const MyInvitationsPage = () => {
         description="Manage invitations sent to you"
       />
 
-     
-        <MyInvitationTable data={data?.data || []} isLoading={isLoading} />
-    
+      <MyInvitationTable data={data?.data || []} isLoading={isLoading} />
     </section>
   );
 };

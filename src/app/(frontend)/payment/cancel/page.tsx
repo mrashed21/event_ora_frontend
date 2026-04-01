@@ -1,7 +1,15 @@
-type Props = {};
+import PaymentCancelPage from "@/components/payment-cancel/payment-cancel";
 
-const Page = ({}: Props) => {
-  return <section>Muhammad Rashed! Welcome to Page Components</section>;
+export const metadata = {
+  title: "Payment Cancelled",
+  description: "This is the payment cancelled page.",
+};
+const Page = () => {
+  return (
+    <section>
+      <PaymentCancelPage />
+    </section>
+  );
 };
 
 export default Page;
