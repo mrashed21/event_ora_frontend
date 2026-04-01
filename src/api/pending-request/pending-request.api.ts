@@ -156,3 +156,19 @@ export const useUpdateRequest = () => {
     },
   });
 };
+
+const getJoinEventApi = async (
+  params?: PendingParticipantsQueryParams,
+): Promise<PendingParticipantsResponse> => {
+  const { data } = await api.get("/participant/my", {
+    params,
+  });
+  return data;
+};
+//* GET join
+export const useJoinEvents = (params?: PendingParticipantsQueryParams) => {
+  return useQuery({
+    queryKey: ["participants-pending", params],
+    queryFn: () => getJoinEventApi(params),
+  });
+};

@@ -93,9 +93,21 @@ export const sidebarItems: SidebarItem[] = [
     roles: ["user"],
   },
   {
-    title: "Join Request",
+    title: "Joined Events",
     icon: ListChecksIcon,
-    path: "/user/join-request",
+    path: "/user/join-event",
+    roles: ["user"],
+  },
+  {
+    title: "Invaitation Request",
+    icon: ListChecksIcon,
+    path: "/user/invitation-request",
+    roles: ["user"],
+  },
+  {
+    title: "Send Invaitation",
+    icon: ListChecksIcon,
+    path: "/user/send-invitation",
     roles: ["user"],
   },
   {
