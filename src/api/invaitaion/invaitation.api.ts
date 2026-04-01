@@ -65,7 +65,7 @@ export interface InvitationEvent {
   organizer: InvitationOrganizer;
 }
 
-export interface SentInvitation {
+export interface InvitationItem {
   id: string;
   email: string;
   event_id: string;
@@ -79,33 +79,14 @@ export interface SentInvitation {
   user: InvitationUser;
 }
 
-export interface SentInvitationsResponse {
+export interface InvitationResponse {
   success: boolean;
   message: string;
-  data: SentInvitation[];
+  data: InvitationItem[];
 }
 
 // =========================
-// GET Sent Invitations API
-// =========================
-export const getSentInvitationsApi =
-  async (): Promise<SentInvitationsResponse> => {
-    const { data } = await api.get("/invitation/sent");
-    return data;
-  };
-
-// =========================
-// GET Sent Invitations Hook
-// =========================
-export const useSentInvitations = () => {
-  return useQuery({
-    queryKey: ["invitations", "sent"],
-    queryFn: getSentInvitationsApi,
-  });
-};
-
-// =========================
-// CREATE Invitation API
+// CREATE Invitation
 // =========================
 export const createInvitationApi = async (payload: {
   user_id: string;
@@ -116,9 +97,6 @@ export const createInvitationApi = async (payload: {
   return data;
 };
 
-// =========================
-// CREATE Invitation Hook
-// =========================
 export const useCreateInvitation = () => {
   const queryClient = useQueryClient();
 
@@ -126,6 +104,67 @@ export const useCreateInvitation = () => {
     mutationFn: createInvitationApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["invitations", "sent"] });
+      queryClient.invalidateQueries({ queryKey: ["invitations", "my"] });
+    },
+  });
+};
+
+// =========================
+// GET Sent Invitations
+// =========================
+export const getSentInvitationsApi = async (): Promise<InvitationResponse> => {
+  const { data } = await api.get("/invitation/sent");
+  return data;
+};
+
+export const useSentInvitations = () => {
+  return useQuery({
+    queryKey: ["invitations", "sent"],
+    queryFn: getSentInvitationsApi,
+  });
+};
+
+// =========================
+// GET My Invitations
+// =========================
+export const getMyInvitationsApi = async (): Promise<InvitationResponse> => {
+  const { data } = await api.get("/invitation/my");
+  return data;
+};
+
+export const useMyInvitations = () => {
+  return useQuery({
+    queryKey: ["invitations", "my"],
+    queryFn: getMyInvitationsApi,
+  });
+};
+
+// =========================
+// ACCEPT / REJECT Invitation
+// =========================
+export const updateInvitationStatusApi = async ({
+  id,
+  action,
+}: {
+  id: string;
+  action: "ACCEPT" | "REJECT";
+}) => {
+  const { data } = await api.patch(`/invitation/${id}`, {
+    action,
+  });
+
+  return data;
+};
+
+export const useUpdateInvitationStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateInvitationStatusApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["invitations", "my"] });
       queryClient.invalidateQueries({ queryKey: ["invitations", "sent"] });
     },
   });

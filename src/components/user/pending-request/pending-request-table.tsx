@@ -45,8 +45,8 @@ const PendingRequestTable = ({
     );
   }
   return (
-    <div className="rounded-2xl border shadow-sm">
-      <div className="overflow-x-auto rounded-xl border">
+    <div className="rounded-md border shadow-sm">
+      <div className="overflow-x-auto rounded-xl border ">
         <Table>
           <TableHeader>
             <TableRow>
@@ -65,7 +65,7 @@ const PendingRequestTable = ({
             </TableRow>
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="capitalize">
             {data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{serial(index)}</TableCell>

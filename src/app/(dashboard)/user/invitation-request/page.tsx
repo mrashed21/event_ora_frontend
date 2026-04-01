@@ -1,3 +1,5 @@
+import MyInvitationsPage from "@/components/user/invitation-request/invitation";
+
 export const metadata = {
   title: "Invitation Request",
   description: "This is the invitation request page.",
@@ -5,7 +7,9 @@ export const metadata = {
 
 const InvaitationPage = () => {
   return (
-    <section>Muhammad Rashed! Welcome to InvaitationPage Components</section>
+    <section>
+      <MyInvitationsPage />
+    </section>
   );
 };
 
