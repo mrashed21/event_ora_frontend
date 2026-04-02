@@ -7,7 +7,7 @@ export const env = createEnv({
   },
 
   client: {
-    NEXT_PUBLIC_BASE_URL: z.string().url(),
+    NEXT_PUBLIC_BASE_URL: z.string(),
   },
 
   runtimeEnv: {
