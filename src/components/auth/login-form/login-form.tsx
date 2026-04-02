@@ -52,13 +52,13 @@ const LoginForm = () => {
       const errorCode = error?.response?.data?.error?.body?.code;
 
       const message =
-        errorCode === "EMAIL_NOT_VERIFIED"
+        error?.response?.data?.message === "Email not verified"
           ? "Email not verified. Please verify your email before logging in."
           : error?.response?.data?.message || "Login failed";
 
       toast.error(message);
 
-      if (errorCode === "EMAIL_NOT_VERIFIED") {
+      if (error?.response?.data?.message === "Email not verified") {
         router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
         return;
       }
