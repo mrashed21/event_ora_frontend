@@ -24,7 +24,6 @@ import { sidebarItems, UserRole } from "./data";
 const AppSidebar = ({ role }: { role: string }) => {
   const pathname = usePathname();
   const router = useRouter();
-
   const { state, setOpen } = useSidebar();
 
   const filtered = sidebarItems.filter((item) =>
@@ -34,16 +33,17 @@ const AppSidebar = ({ role }: { role: string }) => {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <div className="text-center py-4 px-2">
+        <div className="px-2 py-4 text-center">
           <h1 className="text-lg font-bold">EventOra</h1>
         </div>
+
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {filtered.map((item) => {
                 const Icon = item.icon;
 
-                //  NO CHILD → DIRECT ROUTE
+                // NO CHILD → DIRECT ROUTE
                 if (!item.children) {
                   return (
                     <SidebarMenuItem key={item.title}>
@@ -52,7 +52,7 @@ const AppSidebar = ({ role }: { role: string }) => {
                         isActive={pathname === item.path}
                         onClick={() => router.push(item.path!)}
                       >
-                        <Icon />
+                        {Icon && <Icon className="h-4 w-4" />}
                         <span>{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -77,24 +77,29 @@ const AppSidebar = ({ role }: { role: string }) => {
                             }
                           }}
                         >
-                          <Icon />
+                          {Icon && <Icon className="h-4 w-4" />}
                           <span>{item.title}</span>
-                          <ChevronDown className="ml-auto" />
+                          <ChevronDown className="ml-auto h-4 w-4" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
 
                       <CollapsibleContent>
                         <SidebarMenu className="ml-4">
-                          {item.children.map((sub) => (
-                            <SidebarMenuItem key={sub.title}>
-                              <SidebarMenuButton
-                                isActive={pathname === sub.path}
-                                onClick={() => router.push(sub.path!)}
-                              >
-                                <span>{sub.title}</span>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          ))}
+                          {item.children.map((sub) => {
+                            const SubIcon = sub.icon;
+
+                            return (
+                              <SidebarMenuItem key={sub.title}>
+                                <SidebarMenuButton
+                                  isActive={pathname === sub.path}
+                                  onClick={() => router.push(sub.path!)}
+                                >
+                                  {SubIcon && <SubIcon className="h-4 w-4" />}
+                                  <span>{sub.title}</span>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })}
                         </SidebarMenu>
                       </CollapsibleContent>
                     </SidebarMenuItem>

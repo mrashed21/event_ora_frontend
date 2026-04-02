@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import EventReviewSection from "./EventReviewSection";
 
 type Props = {
   id: string;
@@ -25,7 +26,7 @@ const EventDetails = ({ id }: Props) => {
       router.push(res?.data?.checkoutUrl);
     } catch (error) {}
   };
-  // 🔥 Skeleton Loader
+
   if (isLoading) {
     return (
       <section className="py-10 md:py-14">
@@ -67,6 +68,7 @@ const EventDetails = ({ id }: Props) => {
     if (categoryType === "public" && isPaid) return "Pay & Join";
     if (categoryType === "private" && !isPaid) return "Request to Join";
     if (categoryType === "private" && isPaid) return "Pay & Request to Join";
+    return "Join Event";
   };
 
   return (
@@ -101,7 +103,7 @@ const EventDetails = ({ id }: Props) => {
 
             {/* Organizer */}
             <Card>
-              <CardContent className="p-4 space-y-1">
+              <CardContent className="space-y-1 p-4">
                 <h3 className="font-semibold">Organizer</h3>
                 <p className="text-sm text-muted-foreground">
                   {event.organizer?.user_name}
@@ -129,16 +131,24 @@ const EventDetails = ({ id }: Props) => {
               onClick={async () => {
                 await handleParticipation(event.id);
               }}
-              className="w-full h-12 text-base font-semibold"
+              className="h-12 w-full text-base font-semibold"
             >
               {getActionLabel()}
             </Button>
 
             <div className="text-sm text-muted-foreground">
-              👥 Participants: {event._count?.participants || 0}
+              👥 Participants: {event.total_joined || 0}
             </div>
           </div>
         </div>
+
+        {/* 🔥 Review Section */}
+        <EventReviewSection
+          reviews={event.reviews || []}
+          averageRating={event.average_rating || 0}
+          totalReviews={event.total_reviews || 0}
+          totalJoined={event.total_joined || 0}
+        />
       </div>
     </section>
   );
