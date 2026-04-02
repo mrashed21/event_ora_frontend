@@ -31,7 +31,7 @@ const CTASection = () => {
 
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="rounded-full px-8">
-                <Link href="/create-event">
+                <Link href="/user/event">
                   <CalendarPlus className="mr-2 h-5 w-5" />
                   Create Events
                 </Link>
