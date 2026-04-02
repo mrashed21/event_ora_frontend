@@ -332,3 +332,18 @@ export const useDeleteEvent = () => {
     },
   });
 };
+
+export const useSearchEvents = (searchTerm: string) => {
+  return useQuery({
+    queryKey: ["search-events", searchTerm],
+    queryFn: async () => {
+      const res = await api.get(`/event/search`, {
+        params: {
+          search_term: searchTerm,
+        },
+      });
+      return res.data;
+    },
+    enabled: !!searchTerm,
+  });
+};
