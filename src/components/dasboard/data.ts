@@ -8,6 +8,9 @@ import {
   MailPlus,
   Package2,
   ShieldCheck,
+  Star,
+  StarIcon,
+  StarOffIcon,
   User,
   UserCog,
   Users,
@@ -43,6 +46,12 @@ export const sidebarItems: SidebarItem[] = [
     title: "All Events",
     icon: CalendarDays,
     path: "/admin/all-event",
+    roles: ["admin", "super_admin"],
+  },
+  {
+    title: "All Reviews",
+    icon: StarIcon,
+    path: "/admin/all-reviews",
     roles: ["admin", "super_admin"],
   },
   {
@@ -149,6 +158,25 @@ export const sidebarItems: SidebarItem[] = [
         title: "Profile",
         icon: User,
         path: "/user/profile",
+        roles: ["user"],
+      },
+    ],
+  },
+  {
+    title: "Review",
+    icon: StarIcon,
+    roles: ["user"],
+    children: [
+      {
+        title: "My Reviews",
+        icon: Star,
+        path: "/user/reviews",
+        roles: ["user"],
+      },
+      {
+        title: "Received Reviews",
+        icon: StarOffIcon,
+        path: "/user/received-reviews",
         roles: ["user"],
       },
     ],
