@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const GoogleLogin = () => {
   const handleGoogleLogin = () => {
-    window.location.href = `https://eventora-backend.up.railway.app/api/v1/auth/login/google?redirect=/`;
+    window.location.href = `/api/v1/auth/login/google?redirect=/`;
   };
 
   return (
